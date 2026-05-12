@@ -1,9 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import machineImage from "./assets/machine.png";
-import machine2Image from "./assets/machine2.png";
 import zoneMainRealistic from "./assets/zone.png";
-
 
 /* =========================================================
    01 - MACHINE POINTS / TAG CONFIG
@@ -150,22 +148,16 @@ const MACHINE_CONFIGS = {
     zones: MACHINE_ZONES,
   },
 
-  machine2: {
+  /* machine2: {
     id: "machine2",
     name: "Machine 2",
     title: "Machine 2 Command Center",
     subtitle: "Real-time machine status monitoring",
     apiUrl: "http://localhost:5000/data-machine2",
-    image: machine2Image,
-
-    // For now this copies Meshpack points.
-    // Replace this later with Machine 2 tag list.
+    image: machineImage,
     points: MACHINE_POINTS,
-
-    // For now this copies Meshpack zones.
-    // Replace this later with Machine 2 zone locations.
     zones: MACHINE_ZONES,
-  },
+  }, */
 };
 
 export default function App() {
@@ -198,16 +190,16 @@ export default function App() {
   }
 
   useEffect(() => {
-  setMachineData(null);
-  setApiError("");
-  setSelectedPoint(null);
-  setShowDetailsModal(false);
+    setMachineData(null);
+    setApiError("");
+    setSelectedPoint(null);
+    setShowDetailsModal(false);
 
-  fetchMachineData();
+    fetchMachineData();
 
-  const interval = setInterval(fetchMachineData, 1000);
-  return () => clearInterval(interval);
-}, [activeMachineId]);
+    const interval = setInterval(fetchMachineData, 1000);
+    return () => clearInterval(interval);
+  }, [activeMachineId]);
 
   const status = machineData?.status || "WAITING";
   const payload = machineData?.data || {};
@@ -242,7 +234,13 @@ const machineRows = useMemo(() => {
 
     return {
       ...point,
+
+      // Convert Guard ON into guardOpen
+      // Guard ON true  = guardOpen false
+      // Guard ON false = guardOpen true
       guardOpen: !guardOn,
+
+      // Healthy signal maps directly
       interlockOk: healthyOn,
     };
   });
@@ -270,17 +268,17 @@ const machineRows = useMemo(() => {
   ========================================================= */
 
   const zoneRows = useMemo(() => {
-  return activeMachine.zones.map((zone) => {
-    const zoneTags = machineRows.filter((tag) => zone.tagIds.includes(tag.id));
-    const zoneState = getZoneState(zoneTags);
+    return activeMachine.zones.map((zone) => {
+      const zoneTags = machineRows.filter((tag) => zone.tagIds.includes(tag.id));
+      const zoneState = getZoneState(zoneTags);
 
-    return {
-      ...zone,
-      tags: zoneTags,
-      state: zoneState,
-    };
-  });
-}, [machineRows, activeMachine]);
+      return {
+        ...zone,
+        tags: zoneTags,
+        state: zoneState,
+      };
+    });
+  }, [machineRows, activeMachine]);
 
   /* =========================================================
      07 - MACHINE STATE FLAGS
@@ -346,47 +344,47 @@ const machineRows = useMemo(() => {
           10 - TOP HEADER
       ========================================================= */}
 
-      <header className="topbar">
-        <div className="desktop-topbar">
-          <div className="topbar-left">
-            <div className="brand-card">
-              <div className="brand-icon">⚙️</div>
-              <div>
-                <div className="brand-title">MACHINE DASHBOARD</div>
-                <div className="brand-subtitle">HighByte MQTT Monitoring System</div>
-              </div>
-            </div>
-
-            {Object.values(MACHINE_CONFIGS).map((machine) => (
-  <button
-    key={machine.id}
-    className={`top-nav-btn ${
-      activeMachineId === machine.id ? "active" : ""
-    }`}
-    onClick={() => setActiveMachineId(machine.id)}
-  >
-    {machine.name}
-  </button>
-))}
-          </div>
-
-          <div className="topbar-right">
-            <div className={`top-state-inline ${getStatusClass(status)}`}>
-              <div className="top-state-dot" />
-              <span>{status}</span>
-            </div>
-
-            <button
-              className="top-nav-btn"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? "☀ Light" : "🌙 Dark"}
-            </button>
-
-            <div className="admin-chip">Admin</div>
-          </div>
+     <header className="topbar">
+  <div className="desktop-topbar">
+    <div className="topbar-left">
+      <div className="brand-card">
+        <div className="brand-icon">⚙️</div>
+        <div>
+          <div className="brand-title">MACHINE DASHBOARD</div>
+          <div className="brand-subtitle">HighByte MQTT Monitoring System</div>
         </div>
-      </header>
+      </div>
+
+      <div className="topbar-center">
+        <div className={`top-state-inline ${getStatusClass(status)}`}>
+          <div className="top-state-dot" />
+          <span>{status}</span>
+        </div>
+
+        <button
+          className="top-nav-btn"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? "☀ Light" : "🌙 Dark"}
+        </button>
+      </div>
+    </div>
+
+    <div className="topbar-right">
+      {Object.values(MACHINE_CONFIGS).map((machine) => (
+        <button
+          key={machine.id}
+          className={`top-nav-btn ${
+            activeMachineId === machine.id ? "active" : ""
+          }`}
+          onClick={() => setActiveMachineId(machine.id)}
+        >
+          {machine.name}
+        </button>
+      ))}
+    </div>
+  </div>
+</header>
 
       {/* =========================================================
           11 - SUMMARY STRIP
@@ -398,11 +396,10 @@ const machineRows = useMemo(() => {
             {isRunning ? "✓" : isStopped ? "!" : "•"}
           </div>
 
-          <div>
-            <div className="summary-title">{activeMachine.title}</div>
-            <div className="summary-subtitle">{activeMachine.subtitle}</div>
-          </div>
-
+          <div className="summary-title-wrap">
+  <div className="summary-title">{activeMachine.title}</div>
+  <div className="summary-subtitle">{activeMachine.subtitle}</div>
+</div>
           <div
             className={`live-badge ${
               machineData?.mqttConnected ? "online" : "offline"
