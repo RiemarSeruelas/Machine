@@ -1,110 +1,139 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import machineImage from "./assets/machine.png";
+import zoneMainRealistic from "./assets/zone.png";
 
 const API_URL = "http://localhost:5000/data";
 
+/* =========================================================
+   01 - MACHINE POINTS / TAG CONFIG
+   Real tag mapping prepared from your list.
+
+   SFI_DoorX:
+     true  = Guard ON / Door closed
+     false = Guard OFF / Door open
+
+   I_DoorXDiagnostic:
+     true  = Healthy ON
+     false = Healthy OFF
+
+   Frontend internal logic:
+     guardOpen = true means door is open
+     interlockOk = true means healthy
+========================================================= */
+
 const MACHINE_POINTS = [
-  { id: 1, name: "Infeed Guard", area: "Infeed Section", guardOpen: false, interlockOk: true, guardTag: "guard_01_open", interlockTag: "interlock_01_ok" },
-  { id: 2, name: "Infeed Conveyor", area: "Infeed Section", guardOpen: false, interlockOk: true, guardTag: "guard_02_open", interlockTag: "interlock_02_ok" },
-  { id: 3, name: "Film Roll Area", area: "Wrapping Section", guardOpen: false, interlockOk: true, guardTag: "guard_03_open", interlockTag: "interlock_03_ok" },
-  { id: 4, name: "Lower Guard", area: "Wrapping Section", guardOpen: false, interlockOk: true, guardTag: "guard_04_open", interlockTag: "interlock_04_ok" },
-  { id: 5, name: "Main Guard 1", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "guard_05_open", interlockTag: "interlock_05_ok" },
-  { id: 6, name: "Main Guard 2", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "guard_06_open", interlockTag: "interlock_06_ok" },
-  { id: 7, name: "Main Guard 3", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "guard_07_open", interlockTag: "interlock_07_ok" },
-  { id: 8, name: "Main Guard 4", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "guard_08_open", interlockTag: "interlock_08_ok" },
-  { id: 9, name: "Main Guard 5", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "guard_09_open", interlockTag: "interlock_09_ok" },
-  { id: 10, name: "Main Guard 6", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "guard_10_open", interlockTag: "interlock_10_ok" },
-  { id: 11, name: "HMI Panel", area: "Operator Side", guardOpen: false, interlockOk: true, guardTag: "guard_11_open", interlockTag: "interlock_11_ok" },
-  { id: 12, name: "Upper Hopper", area: "Top Loader", guardOpen: false, interlockOk: true, guardTag: "guard_12_open", interlockTag: "interlock_12_ok" },
-  { id: 13, name: "Product Bucket", area: "Top Loader", guardOpen: false, interlockOk: true, guardTag: "guard_13_open", interlockTag: "interlock_13_ok" },
-  { id: 14, name: "Drop Chute", area: "Top Loader", guardOpen: false, interlockOk: true, guardTag: "guard_14_open", interlockTag: "interlock_14_ok" },
-  { id: 15, name: "Transfer Arm", area: "Transfer Section", guardOpen: false, interlockOk: true, guardTag: "guard_15_open", interlockTag: "interlock_15_ok" },
-  { id: 16, name: "Center Door 1", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_16_open", interlockTag: "interlock_16_ok" },
-  { id: 17, name: "Center Door 2", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_17_open", interlockTag: "interlock_17_ok" },
-  { id: 18, name: "Center Door 3", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_18_open", interlockTag: "interlock_18_ok" },
-  { id: 19, name: "Center Door 4", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_19_open", interlockTag: "interlock_19_ok" },
-  { id: 20, name: "Center Door 5", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_20_open", interlockTag: "interlock_20_ok" },
-  { id: 21, name: "Center Door 6", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_21_open", interlockTag: "interlock_21_ok" },
-  { id: 22, name: "Center Door 7", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_22_open", interlockTag: "interlock_22_ok" },
-  { id: 23, name: "Center Door 8", area: "Center Guarding", guardOpen: false, interlockOk: true, guardTag: "guard_23_open", interlockTag: "interlock_23_ok" },
-  { id: 24, name: "Outfeed Guard", area: "Outfeed Section", guardOpen: false, interlockOk: true, guardTag: "guard_24_open", interlockTag: "interlock_24_ok" },
-  { id: 25, name: "Outfeed Conveyor", area: "Outfeed Section", guardOpen: false, interlockOk: true, guardTag: "guard_25_open", interlockTag: "interlock_25_ok" },
-  { id: 26, name: "Lower Motor 1", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_26_open", interlockTag: "interlock_26_ok" },
-  { id: 27, name: "Lower Motor 2", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_27_open", interlockTag: "interlock_27_ok" },
-  { id: 28, name: "Lower Motor 3", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_28_open", interlockTag: "interlock_28_ok" },
-  { id: 29, name: "Lower Motor 4", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_29_open", interlockTag: "interlock_29_ok" },
-  { id: 30, name: "Lower Motor 5", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_30_open", interlockTag: "interlock_30_ok" },
-  { id: 31, name: "Lower Motor 6", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_31_open", interlockTag: "interlock_31_ok" },
-  { id: 32, name: "Lower Motor 7", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_32_open", interlockTag: "interlock_32_ok" },
-  { id: 33, name: "Lower Motor 8", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_33_open", interlockTag: "interlock_33_ok" },
-  { id: 34, name: "Lower Motor 9", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_34_open", interlockTag: "interlock_34_ok" },
-  { id: 35, name: "Outfeed Drive", area: "Drive Section", guardOpen: false, interlockOk: true, guardTag: "guard_35_open", interlockTag: "interlock_35_ok" },
-  { id: 36, name: "Emergency Stop 1", area: "Safety Circuit", guardOpen: false, interlockOk: true, guardTag: "estop_36_active", interlockTag: "safety_36_ok" },
-  { id: 37, name: "Emergency Stop 2", area: "Safety Circuit", guardOpen: false, interlockOk: true, guardTag: "estop_37_active", interlockTag: "safety_37_ok" },
-  { id: 38, name: "Emergency Stop 3", area: "Safety Circuit", guardOpen: false, interlockOk: true, guardTag: "estop_38_active", interlockTag: "safety_38_ok" },
-  { id: 39, name: "Emergency Stop 4", area: "Safety Circuit", guardOpen: false, interlockOk: true, guardTag: "estop_39_active", interlockTag: "safety_39_ok" },
+  { id: 1, name: "Unwinder Door 1", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door1", interlockTag: "I_Door1Diagnostic" },
+  { id: 2, name: "Unwinder Door 2", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door2", interlockTag: "I_Door2Diagnostic" },
+  { id: 3, name: "Machine Door 3", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door3", interlockTag: "I_Door3Diagnostic" },
+  { id: 4, name: "Machine Door 4", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door4", interlockTag: "I_Door4Diagnostic" },
+  { id: 5, name: "Machine Door 5", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door5", interlockTag: "I_Door5Diagnostic" },
+  { id: 6, name: "Machine Door 6", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door6", interlockTag: "I_Door6Diagnostic" },
+  { id: 7, name: "Machine Door 7", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door7", interlockTag: "I_Door7Diagnostic" },
+  { id: 8, name: "Machine Door 8", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door8", interlockTag: "I_Door8Diagnostic" },
+  { id: 9, name: "Machine Door 9", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door9", interlockTag: "I_Door9Diagnostic" },
+  { id: 10, name: "Machine Door 10", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door10", interlockTag: "I_Door10Diagnostic" },
+  { id: 11, name: "Machine Door 11", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door11", interlockTag: "I_Door11Diagnostic" },
+  { id: 12, name: "Machine Door 12", area: "Main Machine", guardOpen: true, interlockOk: true, guardTag: "SFI_Door12", interlockTag: "I_Door12Diagnostic" },
+  { id: 13, name: "Unwinder Door 13", area: "Unwinder Section", guardOpen: true, interlockOk: true, guardTag: "SFI_Door13", interlockTag: "I_Door13Diagnostic" },
+  { id: 14, name: "Unwinder Door 14", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door14", interlockTag: "I_Door14Diagnostic" },
+  { id: 15, name: "Unwinder Door 15", area: "Unwinder Section", guardOpen: false, interlockOk: false, guardTag: "SFI_Door15", interlockTag: "I_Door15Diagnostic" },
+  { id: 16, name: "Unwinder Door 16", area: "Unwinder Section", guardOpen: false, interlockOk: false, guardTag: "SFI_Door16", interlockTag: "I_Door16Diagnostic" },
+  { id: 17, name: "Unwinder Door 17", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door17", interlockTag: "I_Door17Diagnostic" },
+  { id: 18, name: "Unwinder Door 18", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door18", interlockTag: "I_Door18Diagnostic" },
+  { id: 19, name: "Unwinder Door 19", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door19", interlockTag: "I_Door19Diagnostic" },
+  { id: 20, name: "Unwinder Door 20", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door20", interlockTag: "I_Door20Diagnostic" },
+  { id: 21, name: "Machine Door 21", area: "Main Machine", guardOpen: false, interlockOk: true, guardTag: "SFI_Door21", interlockTag: "I_Door21Diagnostic" },
+  { id: 22, name: "Door 22", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door22", interlockTag: "I_Door22Diagnostic" },
+  { id: 23, name: "Door 23", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door23", interlockTag: "I_Door23Diagnostic" },
+  { id: 24, name: "Door 24", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door24", interlockTag: "I_Door24Diagnostic" },
+  { id: 25, name: "Door 25", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door25", interlockTag: "I_Door25Diagnostic" },
+  { id: 26, name: "Door 26", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door26", interlockTag: "I_Door26Diagnostic" },
+  { id: 27, name: "Door 27", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door27", interlockTag: "I_Door27Diagnostic" },
+  { id: 28, name: "Door 28", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door28", interlockTag: "I_Door28Diagnostic" },
+  { id: 29, name: "Door 29", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door29", interlockTag: "I_Door29Diagnostic" },
+  { id: 30, name: "Door 30", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door30", interlockTag: "I_Door30Diagnostic" },
+  { id: 31, name: "Door 31", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door31", interlockTag: "I_Door31Diagnostic" },
+  { id: 32, name: "Door 32", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door32", interlockTag: "I_Door32Diagnostic" },
+  { id: 33, name: "Door 33", area: "Machine Guarding", guardOpen: false, interlockOk: true, guardTag: "SFI_Door33", interlockTag: "I_Door33Diagnostic" }, 
+  { id: 34, name: "Unwinder Door 34", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door34", interlockTag: "I_Door34Diagnostic" },
+  { id: 35, name: "Unwinder Door 35", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door35", interlockTag: "I_Door35Diagnostic" },
+  { id: 36, name: "Unwinder Door 36", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door36", interlockTag: "I_Door36Diagnostic" },
+  { id: 37, name: "Unwinder Door 37", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door37", interlockTag: "I_Door37Diagnostic" },
+  { id: 38, name: "Unwinder Door 38", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door38", interlockTag: "I_Door38Diagnostic" },
+  { id: 39, name: "Unwinder Door 39", area: "Unwinder Section", guardOpen: false, interlockOk: true, guardTag: "SFI_Door39", interlockTag: "I_Door39Diagnostic" },
 ];
+
+/* =========================================================
+   02 - MACHINE SVG ZONES
+   These are the clickable colored polygon areas on the machine.
+========================================================= */
 
 const MACHINE_ZONES = [
   {
     id: "zone-infeed",
     name: "Infeed",
     area: "Infeed Section",
-    points: "8,62 20,52 31,58 31,88 8,88",
+    points: "11,63 22,55 30,60 29,78 11,81",
     labelX: "18%",
-    labelY: "77%",
+    labelY: "73%",
     zoomScale: 2.45,
+    detailImage: zoneMainRealistic,
     tagIds: [1, 2, 26, 36],
   },
   {
     id: "zone-wrapper",
     name: "Wrapping",
     area: "Wrapping Section",
-    points: "28,56 55,42 66,48 64,69 32,84",
-    labelX: "46%",
-    labelY: "66%",
+    points: "30,58 51,48 61,52 59,64 34,75",
+    labelX: "44%",
+    labelY: "63%",
     zoomScale: 2.1,
+    detailImage: zoneMainRealistic,
     tagIds: [3, 4, 5, 6, 7, 27, 28, 29],
   },
   {
     id: "zone-main",
     name: "Main Machine",
     area: "Main Machine",
-    points: "55,43 78,32 88,39 87,58 62,69 55,62",
+    points: "58,50 75,42 86,46 85,57 63,66 58,61",
     labelX: "70%",
-    labelY: "53%",
+    labelY: "55%",
     zoomScale: 2,
+    detailImage: zoneMainRealistic,
     tagIds: [8, 9, 10, 11, 30, 31, 37],
   },
   {
     id: "zone-loader",
     name: "Top Loader",
     area: "Top Loader",
-    points: "57,9 69,5 78,17 74,36 59,38 53,25",
-    labelX: "64%",
-    labelY: "24%",
+    points: "60,15 68,9 75,20 72,32 61,35 56,25",
+    labelX: "65%",
+    labelY: "25%",
     zoomScale: 2.4,
+    detailImage: zoneMainRealistic,
     tagIds: [12, 13, 14, 15, 38],
   },
   {
     id: "zone-center",
     name: "Center Guarding",
     area: "Center Guarding",
-    points: "72,37 94,29 100,38 99,56 76,62",
-    labelX: "86%",
-    labelY: "47%",
+    points: "76,45 92,39 98,44 97,53 79,59",
+    labelX: "87%",
+    labelY: "49%",
     zoomScale: 2.15,
+    detailImage: zoneMainRealistic,
     tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
   },
   {
     id: "zone-outfeed",
     name: "Outfeed",
     area: "Outfeed Section",
-    points: "90,47 100,41 100,61 92,69 87,60",
+    points: "91,50 98,47 99,56 93,62 90,58",
     labelX: "94%",
-    labelY: "59%",
+    labelY: "57%",
     zoomScale: 2.5,
+    detailImage: zoneMainRealistic,
     tagIds: [24, 25, 35, 39],
   },
 ];
@@ -113,9 +142,13 @@ export default function App() {
   const [machineData, setMachineData] = useState(null);
   const [apiError, setApiError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState("light");
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+  /* =========================================================
+     03 - FETCH HIGHBYTE / BACKEND DATA
+  ========================================================= */
 
   async function fetchMachineData() {
     try {
@@ -140,22 +173,68 @@ export default function App() {
   const status = machineData?.status || "WAITING";
   const payload = machineData?.data || {};
 
-  const machineRows = useMemo(() => {
-    return MACHINE_POINTS.map((point) => {
-      const liveGuardValue = payload?.[point.guardTag];
-      const liveInterlockValue = payload?.[point.interlockTag];
+ /* =========================================================
+   04 - BUILD LIVE MACHINE ROWS
+   Converts real PLC tag values into frontend status values.
 
-      return {
-        ...point,
-        guardOpen:
-          liveGuardValue === undefined ? point.guardOpen : toBool(liveGuardValue),
-        interlockOk:
-          liveInterlockValue === undefined
-            ? point.interlockOk
-            : toBool(liveInterlockValue),
-      };
-    });
-  }, [payload]);
+   PLC:
+     SFI_DoorX = Guard ON / closed
+     I_DoorXDiagnostic = Healthy ON
+
+   Frontend:
+     guardOpen = true means door is open
+     interlockOk = true means healthy
+========================================================= */
+
+const machineRows = useMemo(() => {
+  return MACHINE_POINTS.map((point) => {
+    const liveGuardOnValue = payload?.[point.guardTag];
+    const liveHealthyValue = payload?.[point.interlockTag];
+
+    const guardOn =
+      liveGuardOnValue === undefined
+        ? !point.guardOpen
+        : toBool(liveGuardOnValue);
+
+    const healthyOn =
+      liveHealthyValue === undefined
+        ? point.interlockOk
+        : toBool(liveHealthyValue);
+
+    return {
+      ...point,
+
+      // Convert Guard ON into guardOpen
+      // Guard ON true  = guardOpen false
+      // Guard ON false = guardOpen true
+      guardOpen: !guardOn,
+
+      // Healthy signal maps directly
+      interlockOk: healthyOn,
+    };
+  });
+}, [payload]);
+
+  /* =========================================================
+     05 - LEFT PANEL ATTENTION LOGIC
+     attentionRows = everything NOT READY / FAULT / WARNING
+     readyRows     = READY only
+  ========================================================= */
+
+  const attentionRows = machineRows.filter((machine) => {
+    const state = getSafetyState(machine);
+    return state.className !== "safe";
+  });
+
+  const readyRows = machineRows.filter((machine) => {
+    const state = getSafetyState(machine);
+    return state.className === "safe";
+  });
+
+  /* =========================================================
+     06 - BUILD MACHINE ZONES
+     Groups the 39 points into 6 visual machine sections.
+  ========================================================= */
 
   const zoneRows = useMemo(() => {
     return MACHINE_ZONES.map((zone) => {
@@ -170,12 +249,17 @@ export default function App() {
     });
   }, [machineRows]);
 
+  /* =========================================================
+     07 - MACHINE STATE FLAGS
+  ========================================================= */
+
   const isRunning = status === "RUNNING";
   const isStopped = status === "STOPPED";
-  const isWaiting =
-    status === "WAITING" ||
-    status === "UNKNOWN" ||
-    status === "WAITING FOR DATA";
+
+  /* =========================================================
+     08 - ZOOM CALCULATION
+     Used when clicking a machine zone.
+  ========================================================= */
 
   const activeZoomZone = selectedPoint?.type === "zone" ? selectedPoint : null;
   const zoomScale = activeZoomZone?.zoomScale || 1;
@@ -193,6 +277,10 @@ export default function App() {
         "--zoom-pan-x": "0%",
         "--zoom-pan-y": "0%",
       };
+
+  /* =========================================================
+     09 - CLICK HANDLERS
+  ========================================================= */
 
   function openPointDetails(machine, safety) {
     setSelectedPoint({
@@ -221,6 +309,10 @@ export default function App() {
 
   return (
     <div className="app-shell" data-theme={theme}>
+      {/* =========================================================
+          10 - TOP HEADER
+      ========================================================= */}
+
       <header className="topbar">
         <div className="desktop-topbar">
           <div className="topbar-left">
@@ -232,10 +324,7 @@ export default function App() {
               </div>
             </div>
 
-            <button className="top-nav-btn active">Overview</button>
-            <button className="top-nav-btn">Analytics</button>
-            <button className="top-nav-btn">History</button>
-            <button className="top-nav-btn">Maintenance</button>
+            <button className="top-nav-btn active">Meshpack</button>
           </div>
 
           <div className="topbar-right">
@@ -243,8 +332,6 @@ export default function App() {
               <div className="top-state-dot" />
               <span>{status}</span>
             </div>
-
-            <button className="top-nav-btn">Start</button>
 
             <button
               className="top-nav-btn"
@@ -257,6 +344,10 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* =========================================================
+          11 - SUMMARY STRIP
+      ========================================================= */}
 
       <section className="summary-strip">
         <div className="summary-left">
@@ -281,14 +372,24 @@ export default function App() {
         </div>
 
         <div className="summary-stats">
-          <SummaryStat value={machineRows.length} label="POINTS" />
+          <SummaryStat value={attentionRows.length} label="ATTENTION" variant="red" />
           <SummaryStat value={zoneRows.length} label="ZONES" variant="green" />
           <SummaryStat value={isStopped ? "STOP" : "-"} label="STOPPED" variant="red" />
           <SummaryStat value={status} label="STATE" variant="amber" />
         </div>
       </section>
 
+      {/* =========================================================
+          12 - MAIN WORKSPACE
+      ========================================================= */}
+
       <main className="workspace machine-workspace">
+        {/* =========================================================
+            13 - LEFT PANEL
+            Top = Needs Attention
+            Bottom = Ready Points
+        ========================================================= */}
+
         <aside className="panel left-panel machine-left-panel">
           <div className="side-list-header">
             <div>
@@ -299,71 +400,116 @@ export default function App() {
             <div className="side-count">{machineRows.length}</div>
           </div>
 
-          <div className="machine-table compact-machine-table">
-            <div className="machine-table-head compact-head">
-              <span>No.</span>
-              <span>Name</span>
-              <span>Status</span>
-            </div>
-
-            {machineRows.map((machine) => {
-              const safety = getSafetyState(machine);
-
-              return (
-                <button
-                  className={`machine-row compact-row ${
-                    selectedPoint?.type === "point" &&
-                    selectedPoint?.id === machine.id
-                      ? "active"
-                      : ""
-                  }`}
-                  key={machine.id}
-                  onClick={() => openPointDetails(machine, safety)}
-                >
-                  <div className="machine-number">{machine.id}</div>
-
-                  <div className="machine-info">
-                    <div className="machine-row-name">{machine.name}</div>
-                  </div>
-
-                  <span className={`machine-status-chip ${safety.className}`}>
-                    {safety.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {apiError && (
-            <div className="metric-card">
-              <div className="metric-label">API Error</div>
-              <div className="metric-value danger-text small-value">{apiError}</div>
-            </div>
-          )}
-        </aside>
-
-        <section className="panel center-panel machine-center-panel">
-          <div className="table-card">
-            <div className="machine-panel-header">
+          {/* UPDATE: NEEDS ATTENTION SECTION */}
+          <div className="left-attention-card">
+            <div className="attention-header">
               <div>
-                <div className="table-title">Machine Layout</div>
-                <div className="machine-subtitle">
-                  Click a machine section to zoom. Click the label again for details.
+                <div className="attention-title">Needs Attention</div>
+                <div className="attention-subtitle">
+                  Points requiring line acknowledgement
                 </div>
               </div>
 
-              <div className={`machine-state-pill ${getStatusClass(status)}`}>
-                {isRunning ? "GO" : isStopped ? "STOP" : isWaiting ? "WAIT" : "WAIT"}
+              <div
+                className={`attention-count ${
+                  attentionRows.length > 0 ? "active" : ""
+                }`}
+              >
+                {attentionRows.length}
               </div>
             </div>
 
+            {attentionRows.length > 0 ? (
+              <div className="attention-list">
+                {attentionRows.map((machine) => {
+                  const safety = getSafetyState(machine);
+
+                  return (
+                    <button
+                      className={`attention-row ${safety.className} ${
+                        selectedPoint?.type === "point" &&
+                        selectedPoint?.id === machine.id
+                          ? "active"
+                          : ""
+                      }`}
+                      key={`attention-${machine.id}`}
+                      onClick={() => openPointDetails(machine, safety)}
+                    >
+                      <div className="attention-no">{machine.id}</div>
+
+                      <div className="attention-info">
+                        <div className="attention-name">{machine.name}</div>
+                        <div className="attention-area">{machine.area}</div>
+                      </div>
+
+                      <span className={`attention-chip ${safety.className}`}>
+                        {safety.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="attention-empty">All points are ready.</div>
+            )}
+          </div>
+
+          <div className="ready-section-label">
+  <div className="ready-section-title">Ready Points</div>
+  <div className="ready-section-count">{readyRows.length}</div>
+</div>
+
+<div className="machine-table compact-machine-table">
+  <div className="machine-table-head compact-head">
+    <span>No.</span>
+    <span>Name</span>
+    <span>Status</span>
+  </div>
+
+  {readyRows.map((machine) => {
+    const safety = getSafetyState(machine);
+
+    return (
+      <button
+        className={`machine-row compact-row ${
+          selectedPoint?.type === "point" &&
+          selectedPoint?.id === machine.id
+            ? "active"
+            : ""
+        }`}
+        key={machine.id}
+        onClick={() => openPointDetails(machine, safety)}
+      >
+        <div className="machine-number">{machine.id}</div>
+
+        <div className="machine-info">
+          <div className="machine-row-name">{machine.name}</div>
+        </div>
+
+        <span className={`machine-status-chip ${safety.className}`}>
+          {safety.label}
+        </span>
+      </button>
+    );
+  })}
+</div>
+        </aside>
+
+        {/* =========================================================
+            14 - CENTER MACHINE MAP
+        ========================================================= */}
+
+        <section className="panel center-panel machine-center-panel">
+          <div className="table-card">
             <div className={`machine-map ${activeZoomZone ? "zoomed" : ""}`}>
               <div className="machine-map-grid" />
 
               <div className="machine-zoom-layer">
                 <div className="machine-stage">
                   <div
-                    className={`machine-canvas ${activeZoomZone ? "is-zoomed" : ""}`}
+                    className={`machine-canvas ${
+                      activeZoomZone ? "is-zoomed" : ""
+                    }`}
                     style={machineCanvasStyle}
                   >
                     <img
@@ -391,10 +537,6 @@ export default function App() {
                           }`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            selectZone(zone, false);
-                          }}
-                          onDoubleClick={(e) => {
-                            e.stopPropagation();
                             selectZone(zone, true);
                           }}
                         />
@@ -416,15 +558,7 @@ export default function App() {
                         }}
                         onClick={(e) => {
                           e.stopPropagation();
-
-                          if (
-                            selectedPoint?.type === "zone" &&
-                            selectedPoint?.id === zone.id
-                          ) {
-                            selectZone(zone, true);
-                          } else {
-                            selectZone(zone, false);
-                          }
+                          selectZone(zone, true);
                         }}
                         title={`${zone.name} - ${zone.state.label}`}
                       >
@@ -445,10 +579,24 @@ export default function App() {
         </section>
       </main>
 
+      {/* =========================================================
+          15 - DETAILS MODAL
+          Opens when clicking a point or zone.
+      ========================================================= */}
+
       {showDetailsModal && selectedPoint && (
         <div
-          className="details-modal-backdrop"
-          onClick={() => setShowDetailsModal(false)}
+          className={`details-modal-backdrop ${
+            selectedPoint?.type === "zone" && selectedPoint?.detailImage
+              ? "has-detail-image"
+              : ""
+          }`}
+          style={{
+            backgroundImage:
+              selectedPoint?.type === "zone" && selectedPoint?.detailImage
+                ? `linear-gradient(rgba(15, 23, 42, 0.32), rgba(15, 23, 42, 0.72)), url(${selectedPoint.detailImage})`
+                : undefined,
+          }}
         >
           <div className="details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="details-modal-header">
@@ -460,10 +608,7 @@ export default function App() {
                 <div className="details-modal-subtitle">{selectedPoint.area}</div>
               </div>
 
-              <button
-                className="details-modal-close"
-                onClick={() => setShowDetailsModal(false)}
-              >
+              <button className="details-modal-close" onClick={resetView}>
                 ×
               </button>
             </div>
@@ -500,9 +645,10 @@ export default function App() {
                   <DetailItem
                     label="Unsafe Count"
                     value={
-                      selectedPoint.tags.filter(
-                        (tag) => tag.guardOpen || !tag.interlockOk
-                      ).length
+                      selectedPoint.tags.filter((tag) => {
+                        const state = getSafetyState(tag);
+                        return state.className !== "safe";
+                      }).length
                     }
                   />
                 </div>
@@ -533,29 +679,15 @@ export default function App() {
   );
 }
 
+/* =========================================================
+   16 - SMALL COMPONENTS
+========================================================= */
+
 function SummaryStat({ value, label, variant }) {
   return (
     <div className={`summary-stat ${variant || ""}`}>
       <div className="summary-value">{value}</div>
       <div className="summary-label">{label}</div>
-    </div>
-  );
-}
-
-function Metric({ label, value, suffix, state, small }) {
-  return (
-    <div className="metric-card">
-      <div className="metric-label">{label}</div>
-      <div
-        className={[
-          "metric-value",
-          small ? "small-value" : "",
-          state === "safe" ? "safe-text" : "",
-          state === "danger" ? "danger-text" : "",
-        ].join(" ")}
-      >
-        {value} {suffix && value !== "-" ? <small>{suffix}</small> : null}
-      </div>
     </div>
   );
 }
@@ -569,55 +701,100 @@ function DetailItem({ label, value, wide }) {
   );
 }
 
-function getStatusClass(status) {
-  if (status === "RUNNING") return "running";
-  if (status === "STOPPED") return "stopped";
-  return "waiting";
-}
+/* =========================================================
+   17 - STATUS LOGIC
+   Your final mapping:
+   Healthy ON  + Guard ON  = READY / Green
+   Healthy OFF + Guard OFF = NOT READY / Red
+   Healthy OFF + Guard ON  = FAULT / Red
+   Healthy ON  + Guard OFF = NOT READY / Yellow
+========================================================= */
 
 function getSafetyState(point) {
-  if (point.guardOpen) {
+  const healthyOn = point.interlockOk === true;
+  const guardOn = point.guardOpen === false;
+
+  if (healthyOn && guardOn) {
     return {
-      label: "GUARD OPEN",
+      label: "READY",
+      className: "safe",
+    };
+  }
+
+  if (!healthyOn && !guardOn) {
+    return {
+      label: "NOT READY",
       className: "danger",
     };
   }
 
-  if (!point.interlockOk) {
+  if (!healthyOn && guardOn) {
     return {
-      label: "INTERLOCK FAULT",
+      label: "FAULT",
+      className: "danger",
+    };
+  }
+
+  if (healthyOn && !guardOn) {
+    return {
+      label: "NOT READY",
       className: "warning",
     };
   }
 
   return {
-    label: "SAFE",
-    className: "safe",
+    label: "UNKNOWN",
+    className: "warning",
   };
 }
 
 function getZoneState(tags) {
-  const hasGuardOpen = tags.some((tag) => tag.guardOpen);
-  const hasInterlockFault = tags.some((tag) => !tag.interlockOk);
+  const hasRedNotReady = tags.some((tag) => {
+    const healthyOn = tag.interlockOk === true;
+    const guardOn = tag.guardOpen === false;
+    return !healthyOn && !guardOn;
+  });
 
-  if (hasGuardOpen) {
+  const hasFault = tags.some((tag) => {
+    const healthyOn = tag.interlockOk === true;
+    const guardOn = tag.guardOpen === false;
+    return !healthyOn && guardOn;
+  });
+
+  const hasYellowNotReady = tags.some((tag) => {
+    const healthyOn = tag.interlockOk === true;
+    const guardOn = tag.guardOpen === false;
+    return healthyOn && !guardOn;
+  });
+
+  if (hasRedNotReady || hasFault) {
     return {
-      label: "GUARD OPEN",
+      label: "FAULT / NOT READY",
       className: "danger",
     };
   }
 
-  if (hasInterlockFault) {
+  if (hasYellowNotReady) {
     return {
-      label: "INTERLOCK FAULT",
+      label: "NOT READY",
       className: "warning",
     };
   }
 
   return {
-    label: "SAFE",
+    label: "READY",
     className: "safe",
   };
+}
+
+/* =========================================================
+   18 - UTILS
+========================================================= */
+
+function getStatusClass(status) {
+  if (status === "RUNNING") return "running";
+  if (status === "STOPPED") return "stopped";
+  return "waiting";
 }
 
 function toBool(value) {
@@ -639,21 +816,4 @@ function toBool(value) {
 
 function parsePercent(value) {
   return Number(String(value).replace("%", ""));
-}
-
-function formatValue(value) {
-  if (value === undefined || value === null || value === "") return "-";
-  return String(value);
-}
-
-function formatBool(value) {
-  if (value === true || value === "true" || value === 1 || value === "1") {
-    return "TRUE";
-  }
-
-  if (value === false || value === "false" || value === 0 || value === "0") {
-    return "FALSE";
-  }
-
-  return "-";
 }
