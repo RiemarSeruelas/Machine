@@ -72,7 +72,7 @@ const MACHINE_ZONES = [
     id: "zone-infeed",
     name: "Infeed",
     area: "Infeed Section",
-    points: "11,63 22,55 30,60 29,78 11,81",
+    points: "15,62 27,55 33,64 33,83 20,90 15, 82",
     labelX: "18%",
     labelY: "73%",
     zoomScale: 2.45,
@@ -83,7 +83,7 @@ const MACHINE_ZONES = [
     id: "zone-wrapper",
     name: "Wrapping",
     area: "Wrapping Section",
-    points: "30,58 51,48 61,52 59,64 34,75",
+    points: "35,56 56,45 60,50 60,66 38,79 38,60",
     labelX: "44%",
     labelY: "63%",
     zoomScale: 2.1,
@@ -94,7 +94,7 @@ const MACHINE_ZONES = [
     id: "zone-main",
     name: "Main Machine",
     area: "Main Machine",
-    points: "58,50 75,42 86,46 85,57 63,66 58,61",
+    points: "56,45 74,34 77,40 77,57 60,65 60,50",
     labelX: "70%",
     labelY: "55%",
     zoomScale: 2,
@@ -105,29 +105,29 @@ const MACHINE_ZONES = [
     id: "zone-loader",
     name: "Top Loader",
     area: "Top Loader",
-    points: "60,15 68,9 75,20 72,32 61,35 56,25",
+    points: "58,35 61,33 65,10 72,13 77,23 77,30 58,39 ",
     labelX: "65%",
     labelY: "25%",
     zoomScale: 2.4,
     detailImage: zoneMainRealistic,
     tagIds: [12, 13, 14, 15, 38],
   },
-  {
+   {
     id: "zone-center",
     name: "Center Guarding",
     area: "Center Guarding",
-    points: "76,45 92,39 98,44 97,53 79,59",
+    points: "74,34 88.3,26 93,30 93,48 77,57 77,40",
     labelX: "87%",
     labelY: "49%",
     zoomScale: 2.15,
     detailImage: zoneMainRealistic,
     tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
-  },
+  }, 
   {
     id: "zone-outfeed",
     name: "Outfeed",
     area: "Outfeed Section",
-    points: "91,50 98,47 99,56 93,62 90,58",
+    points: "88,48 91,46 95,50 95,60 91,60 88,56",
     labelX: "94%",
     labelY: "57%",
     zoomScale: 2.5,
@@ -137,10 +137,10 @@ const MACHINE_ZONES = [
 ];
 
 const MACHINE_CONFIGS = {
-  meshpack: {
-    id: "meshpack",
-    name: "Meshpack",
-    title: "Meshpack Command Center",
+  mespack: {
+    id: "mespack",
+    name: "Mespack",
+    title: "Mespack Command Center",
     subtitle: "Real-time guard and interlock status",
     apiUrl: "http://localhost:5000/data",
     image: machineImage,
@@ -161,7 +161,7 @@ const MACHINE_CONFIGS = {
 };
 
 export default function App() {
-  const [activeMachineId, setActiveMachineId] = useState("meshpack");
+  const [activeMachineId, setActiveMachineId] = useState("mespack");
   const [machineData, setMachineData] = useState(null);
   const [apiError, setApiError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -762,7 +762,7 @@ function getSafetyState(point) {
 
   if (!healthyOn && !guardOn) {
     return {
-      label: "NOT READY",
+      label: "EXPOSED",
       className: "danger",
     };
   }
@@ -776,7 +776,7 @@ function getSafetyState(point) {
 
   if (healthyOn && !guardOn) {
     return {
-      label: "NOT READY",
+      label: "EXPOSED",
       className: "warning",
     };
   }
@@ -808,14 +808,14 @@ function getZoneState(tags) {
 
   if (hasRedNotReady || hasFault) {
     return {
-      label: "FAULT / NOT READY",
+      label: "FAULT / EXPOSED",
       className: "danger",
     };
   }
 
   if (hasYellowNotReady) {
     return {
-      label: "NOT READY",
+      label: "EXPOSED",
       className: "warning",
     };
   }
