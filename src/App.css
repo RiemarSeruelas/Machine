@@ -249,13 +249,13 @@ button:hover {
 
 .summary-strip {
   width: 100%;
-  min-height: 62px;
-  padding: 8px 20px;
+  min-height: 60px;
+  padding: 0 20px;
   background: linear-gradient(90deg, var(--purple-1), var(--purple-2), var(--purple-3));
   color: white;
   display: grid;
   grid-template-columns: minmax(360px, 1fr) auto minmax(360px, 1fr);
-  align-items: center;
+  align-items: center;       /* important */
   gap: 14px;
   flex-shrink: 0;
 }
@@ -317,15 +317,26 @@ button:hover {
 
 .summary-stats {
   grid-column: 3;
+  justify-self: end;
+  align-self: center;
+
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0;
+
+  height: 100%;
+  min-height: 54px;
 }
 
 .summary-stat {
-  min-width: 78px;
+  min-width: 86px;
+  height: 54px;
   padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;   /* THIS fixes vertical flying */
   text-align: center;
   border-left: 1px solid rgba(255, 255, 255, 0.16);
 }
@@ -334,14 +345,16 @@ button:hover {
   font-size: 18px;
   font-weight: 950;
   line-height: 1;
+  margin: 0;
 }
 
 .summary-label {
-  margin-top: 6px;
+  margin-top: 7px;
   font-size: 7px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
   opacity: 0.65;
+  line-height: 1;
 }
 
 .summary-stat.green .summary-value {
