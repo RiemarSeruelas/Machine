@@ -585,20 +585,21 @@ const machineRows = useMemo(() => {
       ========================================================= */}
 
       {showDetailsModal && selectedPoint && (
-        <div
-          className={`details-modal-backdrop ${
-            selectedPoint?.type === "zone" && selectedPoint?.detailImage
-              ? "has-detail-image"
-              : ""
-          }`}
-          style={{
-            backgroundImage:
-              selectedPoint?.type === "zone" && selectedPoint?.detailImage
-                ? `linear-gradient(rgba(15, 23, 42, 0.32), rgba(15, 23, 42, 0.72)), url(${selectedPoint.detailImage})`
-                : undefined,
-          }}
-        >
-          <div className="details-modal" onClick={(e) => e.stopPropagation()}>
+  <div
+    className={`details-modal-backdrop ${
+      selectedPoint?.type === "zone" && selectedPoint?.detailImage
+        ? "has-detail-image"
+        : ""
+    }`}
+    style={{
+      backgroundImage:
+        selectedPoint?.type === "zone" && selectedPoint?.detailImage
+          ? `linear-gradient(rgba(15, 23, 42, 0.32), rgba(15, 23, 42, 0.72)), url(${selectedPoint.detailImage})`
+          : undefined,
+    }}
+    onClick={resetView}
+  >
+    <div className="details-modal" onClick={(e) => e.stopPropagation()}>
             <div className="details-modal-header">
               <div>
                 <div className="details-modal-kicker">
