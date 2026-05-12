@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 import machineImage from "./assets/machine.png";
+import machine2Image from "./assets/machine2.png";
 import zoneMainRealistic from "./assets/zone.png";
 
-const API_URL = "http://localhost:5000/data";
 
 /* =========================================================
    01 - MACHINE POINTS / TAG CONFIG
@@ -138,7 +138,38 @@ const MACHINE_ZONES = [
   },
 ];
 
+const MACHINE_CONFIGS = {
+  meshpack: {
+    id: "meshpack",
+    name: "Meshpack",
+    title: "Meshpack Command Center",
+    subtitle: "Real-time guard and interlock status",
+    apiUrl: "http://localhost:5000/data",
+    image: machineImage,
+    points: MACHINE_POINTS,
+    zones: MACHINE_ZONES,
+  },
+
+  machine2: {
+    id: "machine2",
+    name: "Machine 2",
+    title: "Machine 2 Command Center",
+    subtitle: "Real-time machine status monitoring",
+    apiUrl: "http://localhost:5000/data-machine2",
+    image: machine2Image,
+
+    // For now this copies Meshpack points.
+    // Replace this later with Machine 2 tag list.
+    points: MACHINE_POINTS,
+
+    // For now this copies Meshpack zones.
+    // Replace this later with Machine 2 zone locations.
+    zones: MACHINE_ZONES,
+  },
+};
+
 export default function App() {
+  const [activeMachineId, setActiveMachineId] = useState("meshpack");
   const [machineData, setMachineData] = useState(null);
   const [apiError, setApiError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -146,13 +177,15 @@ export default function App() {
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+  const activeMachine = MACHINE_CONFIGS[activeMachineId];
+
   /* =========================================================
      03 - FETCH HIGHBYTE / BACKEND DATA
   ========================================================= */
 
   async function fetchMachineData() {
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(activeMachine.apiUrl);
       if (!res.ok) throw new Error(`API error ${res.status}`);
 
       const data = await res.json();
@@ -165,10 +198,16 @@ export default function App() {
   }
 
   useEffect(() => {
-    fetchMachineData();
-    const interval = setInterval(fetchMachineData, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  setMachineData(null);
+  setApiError("");
+  setSelectedPoint(null);
+  setShowDetailsModal(false);
+
+  fetchMachineData();
+
+  const interval = setInterval(fetchMachineData, 1000);
+  return () => clearInterval(interval);
+}, [activeMachineId]);
 
   const status = machineData?.status || "WAITING";
   const payload = machineData?.data || {};
@@ -187,7 +226,7 @@ export default function App() {
 ========================================================= */
 
 const machineRows = useMemo(() => {
-  return MACHINE_POINTS.map((point) => {
+  return activeMachine.points.map((point) => {
     const liveGuardOnValue = payload?.[point.guardTag];
     const liveHealthyValue = payload?.[point.interlockTag];
 
@@ -203,17 +242,11 @@ const machineRows = useMemo(() => {
 
     return {
       ...point,
-
-      // Convert Guard ON into guardOpen
-      // Guard ON true  = guardOpen false
-      // Guard ON false = guardOpen true
       guardOpen: !guardOn,
-
-      // Healthy signal maps directly
       interlockOk: healthyOn,
     };
   });
-}, [payload]);
+}, [payload, activeMachine]);
 
   /* =========================================================
      05 - LEFT PANEL ATTENTION LOGIC
@@ -237,17 +270,17 @@ const machineRows = useMemo(() => {
   ========================================================= */
 
   const zoneRows = useMemo(() => {
-    return MACHINE_ZONES.map((zone) => {
-      const zoneTags = machineRows.filter((tag) => zone.tagIds.includes(tag.id));
-      const zoneState = getZoneState(zoneTags);
+  return activeMachine.zones.map((zone) => {
+    const zoneTags = machineRows.filter((tag) => zone.tagIds.includes(tag.id));
+    const zoneState = getZoneState(zoneTags);
 
-      return {
-        ...zone,
-        tags: zoneTags,
-        state: zoneState,
-      };
-    });
-  }, [machineRows]);
+    return {
+      ...zone,
+      tags: zoneTags,
+      state: zoneState,
+    };
+  });
+}, [machineRows, activeMachine]);
 
   /* =========================================================
      07 - MACHINE STATE FLAGS
@@ -324,7 +357,17 @@ const machineRows = useMemo(() => {
               </div>
             </div>
 
-            <button className="top-nav-btn active">Meshpack</button>
+            {Object.values(MACHINE_CONFIGS).map((machine) => (
+  <button
+    key={machine.id}
+    className={`top-nav-btn ${
+      activeMachineId === machine.id ? "active" : ""
+    }`}
+    onClick={() => setActiveMachineId(machine.id)}
+  >
+    {machine.name}
+  </button>
+))}
           </div>
 
           <div className="topbar-right">
@@ -356,10 +399,8 @@ const machineRows = useMemo(() => {
           </div>
 
           <div>
-            <div className="summary-title">Machine Command Center</div>
-            <div className="summary-subtitle">
-              Real-time stop/go status from HighByte MQTT
-            </div>
+            <div className="summary-title">{activeMachine.title}</div>
+            <div className="summary-subtitle">{activeMachine.subtitle}</div>
           </div>
 
           <div
@@ -513,8 +554,8 @@ const machineRows = useMemo(() => {
                     style={machineCanvasStyle}
                   >
                     <img
-                      src={machineImage}
-                      alt="Machine"
+                      src={activeMachine.image}
+                      alt={activeMachine.name}
                       className="machine-img"
                       onLoad={() => console.log("✅ Machine image loaded")}
                       onError={() => console.log("❌ Machine image failed to load")}
