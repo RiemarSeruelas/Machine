@@ -89,11 +89,15 @@ button:hover {
    03 - TOP HEADER
 ========================================================= */
 
+/* =========================================================
+   03 - TOP HEADER
+========================================================= */
+
 .topbar {
   width: 100%;
   min-height: 68px;
   padding: 8px 20px;
-  background: linear-gradient(90deg, #0b2f5f 0%, #1c1b66 38%, #40147f 100%);
+  background: linear-gradient(90deg, #062b63 0%, #0b4ea2 45%, #0f8cff 100%);
   color: white;
   display: flex;
   align-items: center;
@@ -103,19 +107,42 @@ button:hover {
 
 .desktop-topbar {
   width: 100%;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 14px;
 }
 
-.topbar-left,
+.topbar-left {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 18px;
+  min-width: 0;
+}
+
+.topbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
-  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.topbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .brand-card {
@@ -157,22 +184,24 @@ button:hover {
 .top-nav-btn,
 .top-state-inline,
 .admin-chip {
-  height: 38px;
-  min-height: 38px;
+  height: 36px;
+  min-height: 36px;
   border-radius: 8px;
   padding: 0 16px;
   background: rgba(255, 255, 255, 0.075);
   border: 1px solid rgba(255, 255, 255, 0.13);
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.86);
   font-size: 12px;
   font-weight: 850;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .top-nav-btn.active {
   color: #fff7ca;
   background: rgba(245, 179, 1, 0.18);
   border-color: rgba(245, 179, 1, 0.38);
+  box-shadow: 0 0 0 3px rgba(245, 179, 1, 0.08);
 }
 
 .admin-chip {
@@ -185,7 +214,7 @@ button:hover {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-width: 108px;
+  min-width: 98px;
 }
 
 .top-state-inline.running {
@@ -204,12 +233,15 @@ button:hover {
 }
 
 .top-state-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 999px;
   background: currentColor;
 }
 
+/* =========================================================
+   04 - PURPLE STATUS STRIP
+========================================================= */
 
 /* =========================================================
    04 - PURPLE STATUS STRIP
@@ -217,110 +249,112 @@ button:hover {
 
 .summary-strip {
   width: 100%;
-  min-height: 58px;
-  padding: 8px 22px;
+  min-height: 60px;
+  padding: 0 20px;
   background: linear-gradient(90deg, var(--purple-1), var(--purple-2), var(--purple-3));
   color: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) auto minmax(360px, 1fr);
+  align-items: center;       /* important */
+  gap: 14px;
   flex-shrink: 0;
 }
 
 .summary-left {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 10px;
-  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.summary-title-wrap {
+  min-width: 0;
 }
 
 .summary-badge {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 10px;
   display: grid;
   place-items: center;
   font-weight: 950;
-  font-size: 16px;
+  font-size: 15px;
   background: rgba(255, 255, 255, 0.14);
-}
-
-.machine-badge.running {
-  background: rgba(34, 197, 94, 0.25);
-  color: #dcfce7;
-}
-
-.machine-badge.stopped {
-  background: rgba(239, 68, 68, 0.25);
-  color: #fee2e2;
-}
-
-.machine-badge.waiting {
-  background: rgba(245, 179, 1, 0.25);
-  color: #fef3c7;
+  flex-shrink: 0;
 }
 
 .summary-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 950;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-subtitle {
-  margin-top: 4px;
-  font-size: 10px;
+  margin-top: 5px;
+  font-size: 9px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .live-badge {
   margin-left: 8px;
-  padding: 5px 11px;
+  padding: 7px 13px;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.06em;
   font-weight: 850;
   border: 1px solid rgba(255, 255, 255, 0.16);
-}
-
-.live-badge.online {
-  background: rgba(34, 197, 94, 0.16);
-  color: #dcfce7;
-}
-
-.live-badge.offline {
-  background: rgba(239, 68, 68, 0.16);
-  color: #fee2e2;
+  white-space: nowrap;
 }
 
 .summary-stats {
+  grid-column: 3;
+  justify-self: end;
+  align-self: center;
+
   display: flex;
+  align-items: center;
+  justify-content: flex-end;
   gap: 0;
-  flex-wrap: wrap;
+
+  height: 100%;
+  min-height: 54px;
 }
 
 .summary-stat {
   min-width: 86px;
-  padding: 0 18px;
+  height: 54px;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;   /* THIS fixes vertical flying */
   text-align: center;
   border-left: 1px solid rgba(255, 255, 255, 0.16);
 }
 
 .summary-value {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 950;
   line-height: 1;
+  margin: 0;
 }
 
 .summary-label {
-  margin-top: 6px;
-  font-size: 8px;
+  margin-top: 7px;
+  font-size: 7px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
   opacity: 0.65;
+  line-height: 1;
 }
 
 .summary-stat.green .summary-value {
@@ -408,7 +442,7 @@ button:hover {
 }
 
 .app-shell[data-theme="dark"] .side-list-header {
-  background: linear-gradient(135deg, #020617, #1e1b4b);
+  background: linear-gradient(135deg, #020617, #0f2f68);
 }
 
 .app-shell[data-theme="dark"] .left-attention-card {
@@ -1422,30 +1456,97 @@ button:hover {
   background: transparent;
 }
 
-
 /* =========================================================
-   20 - RESPONSIVE LAYOUT
+   20 - RESPONSIVE FIX FOR CURRENT TOPBAR STRUCTURE
 ========================================================= */
 
 @media (max-width: 1180px) {
-  .workspace,
-  .machine-workspace {
-    grid-template-columns: 1fr;
-    height: calc(100vh - 126px);
-    max-height: calc(100vh - 126px);
-    overflow: hidden;
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
-  .compact-machine-table {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+    max-height: none;
     overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .topbar {
+    padding: 10px 14px;
+    min-height: auto;
+  }
+
+  .desktop-topbar {
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+  }
+
+  .brand-card {
+    height: 44px;
+    padding: 4px 0;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-title {
+    font-size: 16px;
+  }
+
+  .brand-subtitle {
+    font-size: 7px;
+  }
+
+  .top-nav-btn,
+  .top-state-inline {
+    height: 32px;
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 10px;
+  }
+
+  .summary-strip {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 10px 14px;
+    gap: 10px;
+  }
+
+  .summary-stats {
+    grid-column: auto;
+  }
+
+  .workspace,
+  .machine-workspace {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    grid-template-columns: 1fr;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .machine-center-panel {
+    order: 1;
+    min-height: 520px;
+  }
+
+  .machine-left-panel {
+    order: 2;
+    min-height: 360px;
+    max-height: 460px;
   }
 
   .machine-map {
-    height: 100%;
-    min-height: 0;
+    min-height: 500px;
   }
 }
 
@@ -1455,71 +1556,625 @@ button:hover {
   }
 
   .desktop-topbar {
-    align-items: flex-start;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand actions"
+      "machines machines";
+    align-items: center;
+    gap: 8px;
   }
 
-  .topbar-left,
+  .topbar-left {
+    grid-area: brand;
+  }
+
+  .topbar-center {
+    grid-area: actions;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
   .topbar-right {
-    width: 100%;
+    grid-area: machines;
+    justify-content: flex-start;
+    padding-left: 40px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .topbar-right::-webkit-scrollbar {
+    height: 0;
   }
 
   .brand-card {
-    width: 100%;
+    height: 38px;
     min-width: 0;
+    padding: 0;
+    gap: 9px;
   }
 
-  .top-nav-btn,
+  .brand-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 13px;
+  }
+
+  .brand-title {
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  .brand-subtitle {
+    margin-top: 4px;
+    font-size: 6.5px;
+    letter-spacing: 0.12em;
+  }
+
   .top-state-inline {
-    height: 36px;
-    min-height: 36px;
-    padding: 0 12px;
-    font-size: 11px;
+    min-width: auto;
+    height: 28px;
+    min-height: 28px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 8px;
+    gap: 5px;
+  }
+
+  .top-state-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .topbar-center .top-nav-btn {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 8px;
+  }
+
+  .topbar-right .top-nav-btn {
+    flex-shrink: 0;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 9px;
   }
 
   .summary-strip {
-    align-items: stretch;
-    flex-direction: column;
+    grid-template-columns: 1fr;
     padding: 10px 12px;
+    gap: 9px;
+  }
+
+  .summary-left {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .summary-badge {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .summary-title {
+    font-size: 14px;
+  }
+
+  .summary-subtitle {
+    font-size: 7px;
+  }
+
+  .live-badge {
+    margin-left: 0;
+    padding: 6px 8px;
+    font-size: 7px;
   }
 
   .summary-stats {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
   .summary-stat {
     min-width: 0;
-    padding: 8px 6px;
+    padding: 9px 6px;
     border-left: none;
+    border-radius: 12px;
     background: rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
   }
 
-  .workspace {
-    padding: 12px;
+  .summary-value {
+    font-size: 15px;
   }
+
+  .summary-label {
+    font-size: 6.5px;
+  }
+
+  .workspace,
+  .machine-workspace {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .machine-center-panel {
+    order: 1;
+    min-height: auto;
+  }
+
+  .machine-left-panel {
+    order: 2;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .machine-map {
+    height: 360px;
+    min-height: 360px;
+  }
+
+  .machine-stage {
+    width: 98%;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-title {
+    font-size: 13px;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .topbar-right {
+    padding-left: 38px;
+  }
+
+  .summary-title {
+    font-size: 12px;
+  }
+
+  .summary-subtitle {
+    font-size: 6.5px;
+  }
+
+  .machine-map {
+    height: 320px;
+    min-height: 320px;
+  }
+}
 
   .machine-stage {
     width: 94%;
   }
 
+  .left-attention-card {
+    max-height: 180px;
+  }
+
+  .attention-list {
+    max-height: 128px;
+  }
+
+  .compact-machine-table {
+    max-height: 220px;
+  }
+
+@media (max-width: 768px) {
+  .topbar {
+    padding: 10px 12px;
+  }
+
+  .desktop-topbar {
+    gap: 8px;
+  }
+
+  .topbar-main-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .brand-card {
+    height: 38px;
+    padding: 0;
+    gap: 9px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 13px;
+  }
+
+  .brand-title {
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  .brand-subtitle {
+    margin-top: 4px;
+    font-size: 6.5px;
+    letter-spacing: 0.12em;
+  }
+
+  .topbar-status-actions {
+    margin-left: 0;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .top-state-inline {
+    min-width: auto;
+    height: 28px;
+    min-height: 28px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 8px;
+    gap: 5px;
+  }
+
+  .top-state-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .theme-toggle-btn {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 8px;
+  }
+
+  .admin-chip {
+    display: none;
+  }
+
+  .topbar-machine-row {
+    width: 100%;
+    padding-left: 39px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .topbar-machine-row .top-nav-btn {
+    flex-shrink: 0;
+    height: 30px;
+    min-height: 30px;
+    padding: 0 14px;
+    border-radius: 999px;
+    font-size: 9px;
+  }
+
+  .summary-strip {
+    padding: 10px 12px;
+    gap: 9px;
+  }
+
+  .summary-left {
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .summary-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 13px;
+  }
+
+  .summary-title {
+    font-size: 14px;
+  }
+
+  .summary-subtitle {
+    font-size: 7px;
+    letter-spacing: 0.08em;
+  }
+
+  .live-badge {
+    padding: 6px 8px;
+    font-size: 7px;
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .summary-stat {
+    padding: 9px 6px;
+    border-radius: 12px;
+  }
+
+  .summary-value {
+    font-size: 15px;
+  }
+
+  .summary-label {
+    font-size: 6.5px;
+  }
+
+  .workspace,
+  .machine-workspace {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .panel {
+    border-radius: 16px;
+  }
+
+  .left-panel,
+  .center-panel {
+    padding: 9px;
+  }
+
+  .machine-center-panel {
+    order: 1;
+    min-height: auto;
+  }
+
+  .machine-left-panel {
+    order: 2;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .table-card {
+    min-height: auto;
+  }
+
+  .machine-map {
+    height: 360px;
+    min-height: 360px;
+    border-radius: 16px;
+  }
+
+  .machine-stage {
+    width: 98%;
+  }
+
+  .machine-zone-label {
+    min-width: auto;
+    height: 21px;
+    padding: 0 7px;
+    font-size: 7px;
+  }
+
+  .reset-zoom-btn {
+    right: 10px;
+    bottom: 10px;
+    height: 30px;
+    padding: 0 11px;
+    font-size: 10px;
+  }
+
+  .side-list-header {
+    padding: 9px 10px;
+    border-radius: 12px;
+  }
+
+  .panel-title,
+  .attention-title,
+  .ready-section-title {
+    font-size: 11px;
+  }
+
+  .side-list-subtitle {
+    font-size: 7px;
+  }
+
+  .left-attention-card {
+    max-height: none;
+  }
+
+  .attention-list {
+    max-height: 180px;
+    padding: 8px;
+    gap: 7px;
+  }
+
+  .attention-row,
+  .machine-row,
+  .compact-row {
+    grid-template-columns: 30px minmax(0, 1fr) 74px;
+    min-height: 42px;
+    padding: 7px 8px;
+    gap: 8px;
+    border-radius: 13px;
+  }
+
+  .attention-no,
+  .machine-number {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+    border-radius: 8px;
+  }
+
+  .attention-name,
+  .machine-row-name {
+    font-size: 11px;
+  }
+
+  .attention-chip,
+  .machine-status-chip {
+    min-width: 68px;
+    padding: 7px 6px;
+    font-size: 6.5px;
+  }
+
+  .compact-machine-table {
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .details-modal-backdrop {
+    padding: 12px;
+    align-items: end;
+  }
+
   .details-modal {
-    max-height: 90vh;
+    width: 100%;
+    max-height: 86vh;
+    border-radius: 22px 22px 16px 16px;
     padding: 14px;
+  }
+
+  .details-modal-title {
+    font-size: 19px;
+  }
+
+  .details-modal-subtitle {
+    font-size: 11px;
   }
 
   .details-grid {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .detail-item {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .detail-label {
+    font-size: 9px;
+  }
+
+  .detail-value {
+    font-size: 12px;
   }
 
   .zone-tag-row {
-    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 10px;
   }
 
   .zone-tag-status {
     grid-column: 2;
     width: fit-content;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar {
+    padding: 9px 10px;
+  }
+
+  .brand-card {
+    height: 34px;
+  }
+
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .brand-title {
+    font-size: 13px;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .top-state-inline,
+  .theme-toggle-btn {
+    height: 26px;
+    min-height: 26px;
+    padding: 0 8px;
+    font-size: 7px;
+  }
+
+  .topbar-machine-row {
+    padding-left: 37px;
+  }
+
+  .topbar-machine-row .top-nav-btn {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 12px;
+    font-size: 8px;
+  }
+
+  .summary-left {
+    grid-template-columns: 28px minmax(0, 1fr) auto;
+  }
+
+  .summary-badge {
+    width: 28px;
+    height: 28px;
+  }
+
+  .summary-title {
+    font-size: 12px;
+  }
+
+  .summary-subtitle {
+    font-size: 6.5px;
+  }
+
+  .live-badge {
+    padding: 5px 7px;
+    font-size: 6.5px;
+  }
+
+  .machine-map {
+    height: 320px;
+    min-height: 320px;
+  }
+
+  .machine-zone-label {
+    height: 20px;
+    padding: 0 6px;
+    font-size: 7px;
+  }
+
+  .attention-row,
+  .machine-row,
+  .compact-row {
+    grid-template-columns: 28px minmax(0, 1fr) 70px;
+  }
+
+  .attention-chip,
+  .machine-status-chip {
+    min-width: 66px;
+    font-size: 6.5px;
+  }
+
+  .compact-machine-table {
+    max-height: 230px;
   }
 }

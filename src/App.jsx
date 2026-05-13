@@ -3,8 +3,6 @@ import "./App.css";
 import machineImage from "./assets/machine.png";
 import zoneMainRealistic from "./assets/zone.png";
 
-const API_URL = "http://localhost:5000/data";
-
 /* =========================================================
    01 - MACHINE POINTS / TAG CONFIG
    Real tag mapping prepared from your list.
@@ -74,7 +72,7 @@ const MACHINE_ZONES = [
     id: "zone-infeed",
     name: "Infeed",
     area: "Infeed Section",
-    points: "11,63 22,55 30,60 29,78 11,81",
+    points: "15,62 27,55 33,64 33,83 20,90 15, 82",
     labelX: "18%",
     labelY: "73%",
     zoomScale: 2.45,
@@ -85,7 +83,7 @@ const MACHINE_ZONES = [
     id: "zone-wrapper",
     name: "Wrapping",
     area: "Wrapping Section",
-    points: "30,58 51,48 61,52 59,64 34,75",
+    points: "35,56 56,45 60,50 60,66 38,79 38,60",
     labelX: "44%",
     labelY: "63%",
     zoomScale: 2.1,
@@ -96,7 +94,7 @@ const MACHINE_ZONES = [
     id: "zone-main",
     name: "Main Machine",
     area: "Main Machine",
-    points: "58,50 75,42 86,46 85,57 63,66 58,61",
+    points: "56,45 74,34 77,40 77,57 60,65 60,50",
     labelX: "70%",
     labelY: "55%",
     zoomScale: 2,
@@ -107,29 +105,29 @@ const MACHINE_ZONES = [
     id: "zone-loader",
     name: "Top Loader",
     area: "Top Loader",
-    points: "60,15 68,9 75,20 72,32 61,35 56,25",
+    points: "58,35 61,33 65,10 72,13 77,23 77,30 58,39 ",
     labelX: "65%",
     labelY: "25%",
     zoomScale: 2.4,
     detailImage: zoneMainRealistic,
     tagIds: [12, 13, 14, 15, 38],
   },
-  {
+   {
     id: "zone-center",
     name: "Center Guarding",
     area: "Center Guarding",
-    points: "76,45 92,39 98,44 97,53 79,59",
+    points: "74,34 88.3,26 93,30 93,48 77,57 77,40",
     labelX: "87%",
     labelY: "49%",
     zoomScale: 2.15,
     detailImage: zoneMainRealistic,
     tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
-  },
+  }, 
   {
     id: "zone-outfeed",
     name: "Outfeed",
     area: "Outfeed Section",
-    points: "91,50 98,47 99,56 93,62 90,58",
+    points: "88,48 91,46 95,50 95,60 91,60 88,56",
     labelX: "94%",
     labelY: "57%",
     zoomScale: 2.5,
@@ -138,7 +136,32 @@ const MACHINE_ZONES = [
   },
 ];
 
+const MACHINE_CONFIGS = {
+  mespack: {
+    id: "mespack",
+    name: "Mespack",
+    title: "Mespack Command Center",
+    subtitle: "Real-time guard and interlock status",
+    apiUrl: "http://localhost:5000/data",
+    image: machineImage,
+    points: MACHINE_POINTS,
+    zones: MACHINE_ZONES,
+  },
+
+  /* machine2: {
+    id: "machine2",
+    name: "Machine 2",
+    title: "Machine 2 Command Center",
+    subtitle: "Real-time machine status monitoring",
+    apiUrl: "http://localhost:5000/data-machine2",
+    image: machineImage,
+    points: MACHINE_POINTS,
+    zones: MACHINE_ZONES,
+  }, */
+};
+
 export default function App() {
+  const [activeMachineId, setActiveMachineId] = useState("mespack");
   const [machineData, setMachineData] = useState(null);
   const [apiError, setApiError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -146,13 +169,15 @@ export default function App() {
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+  const activeMachine = MACHINE_CONFIGS[activeMachineId];
+
   /* =========================================================
      03 - FETCH HIGHBYTE / BACKEND DATA
   ========================================================= */
 
   async function fetchMachineData() {
     try {
-      const res = await fetch(API_URL);
+      const res = await fetch(activeMachine.apiUrl);
       if (!res.ok) throw new Error(`API error ${res.status}`);
 
       const data = await res.json();
@@ -165,10 +190,16 @@ export default function App() {
   }
 
   useEffect(() => {
+    setMachineData(null);
+    setApiError("");
+    setSelectedPoint(null);
+    setShowDetailsModal(false);
+
     fetchMachineData();
+
     const interval = setInterval(fetchMachineData, 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [activeMachineId]);
 
   const status = machineData?.status || "WAITING";
   const payload = machineData?.data || {};
@@ -187,7 +218,7 @@ export default function App() {
 ========================================================= */
 
 const machineRows = useMemo(() => {
-  return MACHINE_POINTS.map((point) => {
+  return activeMachine.points.map((point) => {
     const liveGuardOnValue = payload?.[point.guardTag];
     const liveHealthyValue = payload?.[point.interlockTag];
 
@@ -213,7 +244,7 @@ const machineRows = useMemo(() => {
       interlockOk: healthyOn,
     };
   });
-}, [payload]);
+}, [payload, activeMachine]);
 
   /* =========================================================
      05 - LEFT PANEL ATTENTION LOGIC
@@ -237,7 +268,7 @@ const machineRows = useMemo(() => {
   ========================================================= */
 
   const zoneRows = useMemo(() => {
-    return MACHINE_ZONES.map((zone) => {
+    return activeMachine.zones.map((zone) => {
       const zoneTags = machineRows.filter((tag) => zone.tagIds.includes(tag.id));
       const zoneState = getZoneState(zoneTags);
 
@@ -247,7 +278,7 @@ const machineRows = useMemo(() => {
         state: zoneState,
       };
     });
-  }, [machineRows]);
+  }, [machineRows, activeMachine]);
 
   /* =========================================================
      07 - MACHINE STATE FLAGS
@@ -313,37 +344,47 @@ const machineRows = useMemo(() => {
           10 - TOP HEADER
       ========================================================= */}
 
-      <header className="topbar">
-        <div className="desktop-topbar">
-          <div className="topbar-left">
-            <div className="brand-card">
-              <div className="brand-icon">⚙️</div>
-              <div>
-                <div className="brand-title">MACHINE DASHBOARD</div>
-                <div className="brand-subtitle">HighByte MQTT Monitoring System</div>
-              </div>
-            </div>
-
-            <button className="top-nav-btn active">Meshpack</button>
-          </div>
-
-          <div className="topbar-right">
-            <div className={`top-state-inline ${getStatusClass(status)}`}>
-              <div className="top-state-dot" />
-              <span>{status}</span>
-            </div>
-
-            <button
-              className="top-nav-btn"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            >
-              {theme === "dark" ? "☀ Light" : "🌙 Dark"}
-            </button>
-
-            <div className="admin-chip">Admin</div>
-          </div>
+     <header className="topbar">
+  <div className="desktop-topbar">
+    <div className="topbar-left">
+      <div className="brand-card">
+        <div className="brand-icon">⚙️</div>
+        <div>
+          <div className="brand-title">MACHINE DASHBOARD</div>
+          <div className="brand-subtitle">HighByte MQTT Monitoring System</div>
         </div>
-      </header>
+      </div>
+
+      <div className="topbar-center">
+        <div className={`top-state-inline ${getStatusClass(status)}`}>
+          <div className="top-state-dot" />
+          <span>{status}</span>
+        </div>
+
+        <button
+          className="top-nav-btn"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? "☀ Light" : "🌙 Dark"}
+        </button>
+      </div>
+    </div>
+
+    <div className="topbar-right">
+      {Object.values(MACHINE_CONFIGS).map((machine) => (
+        <button
+          key={machine.id}
+          className={`top-nav-btn ${
+            activeMachineId === machine.id ? "active" : ""
+          }`}
+          onClick={() => setActiveMachineId(machine.id)}
+        >
+          {machine.name}
+        </button>
+      ))}
+    </div>
+  </div>
+</header>
 
       {/* =========================================================
           11 - SUMMARY STRIP
@@ -355,13 +396,10 @@ const machineRows = useMemo(() => {
             {isRunning ? "✓" : isStopped ? "!" : "•"}
           </div>
 
-          <div>
-            <div className="summary-title">Machine Command Center</div>
-            <div className="summary-subtitle">
-              Real-time stop/go status from HighByte MQTT
-            </div>
-          </div>
-
+          <div className="summary-title-wrap">
+  <div className="summary-title">{activeMachine.title}</div>
+  <div className="summary-subtitle">{activeMachine.subtitle}</div>
+</div>
           <div
             className={`live-badge ${
               machineData?.mqttConnected ? "online" : "offline"
@@ -513,8 +551,8 @@ const machineRows = useMemo(() => {
                     style={machineCanvasStyle}
                   >
                     <img
-                      src={machineImage}
-                      alt="Machine"
+                      src={activeMachine.image}
+                      alt={activeMachine.name}
                       className="machine-img"
                       onLoad={() => console.log("✅ Machine image loaded")}
                       onError={() => console.log("❌ Machine image failed to load")}
@@ -724,7 +762,7 @@ function getSafetyState(point) {
 
   if (!healthyOn && !guardOn) {
     return {
-      label: "NOT READY",
+      label: "EXPOSED",
       className: "danger",
     };
   }
@@ -738,7 +776,7 @@ function getSafetyState(point) {
 
   if (healthyOn && !guardOn) {
     return {
-      label: "NOT READY",
+      label: "EXPOSED",
       className: "warning",
     };
   }
@@ -770,14 +808,14 @@ function getZoneState(tags) {
 
   if (hasRedNotReady || hasFault) {
     return {
-      label: "FAULT / NOT READY",
+      label: "FAULT / EXPOSED",
       className: "danger",
     };
   }
 
   if (hasYellowNotReady) {
     return {
-      label: "NOT READY",
+      label: "EXPOSED",
       className: "warning",
     };
   }
