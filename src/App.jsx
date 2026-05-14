@@ -246,7 +246,7 @@ const machineRows = useMemo(() => {
   });
 }, [payload, activeMachine]);
 
-  /* =========================================================
+  /* ====================================================   =====
      05 - LEFT PANEL ATTENTION LOGIC
      attentionRows = everything NOT READY / FAULT / WARNING
      readyRows     = READY only
