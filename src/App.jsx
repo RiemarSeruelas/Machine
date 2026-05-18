@@ -831,8 +831,12 @@ function getZoneState(tags) {
 ========================================================= */
 
 function getStatusClass(status) {
+  if (status === "READY") return "running";
+  if (status === "DIAGNOSTIC") return "stopped";
+  if (status === "GUARD OPEN") return "stopped";
   if (status === "RUNNING") return "running";
   if (status === "STOPPED") return "stopped";
+
   return "waiting";
 }
 
