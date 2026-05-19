@@ -77,7 +77,7 @@ const MACHINE_ZONES = [
     labelY: "73%",
     zoomScale: 2.45,
     detailImage: zoneMainRealistic,
-    tagIds: [1, 2, 26, 36],
+    tagIds: [34, 35, 36, 37, 38, 39],
   },
   {
     id: "zone-wrapper",
@@ -88,7 +88,7 @@ const MACHINE_ZONES = [
     labelY: "63%",
     zoomScale: 2.1,
     detailImage: zoneMainRealistic,
-    tagIds: [3, 4, 5, 6, 7, 27, 28, 29],
+    tagIds: [1, 2, 3, 4, 5, 6, 33, 32, 31, 30, 29, 28],
   },
   {
     id: "zone-main",
@@ -99,7 +99,7 @@ const MACHINE_ZONES = [
     labelY: "55%",
     zoomScale: 2,
     detailImage: zoneMainRealistic,
-    tagIds: [8, 9, 10, 11, 30, 31, 37],
+    tagIds: [7, 8, 9, 10, 27, 26, 25, 24],
   },
   {
     id: "zone-loader",
@@ -110,7 +110,7 @@ const MACHINE_ZONES = [
     labelY: "25%",
     zoomScale: 2.4,
     detailImage: zoneMainRealistic,
-    tagIds: [12, 13, 14, 15, 38],
+    tagIds: [23, 22, 21, 20],
   },
    {
     id: "zone-center",
@@ -121,7 +121,7 @@ const MACHINE_ZONES = [
     labelY: "49%",
     zoomScale: 2.15,
     detailImage: zoneMainRealistic,
-    tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
+    tagIds: [11, 12, 13, 14, 19, 18, 17, 16],
   }, 
   {
     id: "zone-outfeed",
@@ -132,7 +132,7 @@ const MACHINE_ZONES = [
     labelY: "57%",
     zoomScale: 2.5,
     detailImage: zoneMainRealistic,
-    tagIds: [24, 25, 35, 39],
+    tagIds: [15, 14],
   },
 ];
 
@@ -439,7 +439,7 @@ const machineRows = useMemo(() => {
             <div className="side-count">{machineRows.length}</div>
           </div>
 
-          <SafetyLegend />
+
 
           {/* UPDATE: NEEDS ATTENTION SECTION */}
           <div className="left-attention-card">
@@ -725,40 +725,6 @@ const machineRows = useMemo(() => {
    16 - SMALL COMPONENTS
 ========================================================= */
 
-function SafetyLegend() {
-  return (
-    <div className="safety-legend-card">
-      <div className="safety-legend-head">
-        <span>State</span>
-        <span>Meaning</span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy ON + Guard ON</span>
-        <span className="legend-meaning ready">
-          <span className="legend-icon ready">✓</span>
-          Ready
-        </span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy OFF + Guard OFF</span>
-        <span className="legend-meaning warning">
-          <span className="legend-dot warning" />
-          Guard open
-        </span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy OFF + Guard ON</span>
-        <span className="legend-meaning danger">
-          <span className="legend-dot danger" />
-          Fault
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function SummaryStat({ value, label, variant }) {
   return (
