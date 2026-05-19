@@ -762,21 +762,21 @@ function getSafetyState(point) {
 
   if (!healthyOn && !guardOn) {
     return {
-      label: "EXPOSED",
+      label: "UNSAFE",
       className: "danger",
     };
   }
 
   if (!healthyOn && guardOn) {
     return {
-      label: "FAULT",
+      label: "INTERLOCK FAULT",
       className: "danger",
     };
   }
 
   if (healthyOn && !guardOn) {
     return {
-      label: "EXPOSED",
+      label: "GUARD OPEN",
       className: "warning",
     };
   }
@@ -808,7 +808,7 @@ function getZoneState(tags) {
 
   if (hasRedNotReady || hasFault) {
     return {
-      label: "FAULT / EXPOSED",
+      label: "INTERLOCK FAULT",
       className: "danger",
     };
   }
