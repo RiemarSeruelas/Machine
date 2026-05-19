@@ -105,7 +105,7 @@ const MACHINE_ZONES = [
     id: "zone-loader",
     name: "Top Loader",
     area: "Top Loader",
-    points: "58,35 61,33 65,10 72,13 77,23 77,30 58,39 ",
+    points: "58,34 61,32 65,10 66.3,10 68.5,14 72,13 77,23 77,30 58,39 ",
     labelX: "65%",
     labelY: "25%",
     zoomScale: 2.4,
