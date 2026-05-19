@@ -2178,3 +2178,125 @@ button:hover {
     max-height: 230px;
   }
 }
+
+
+/* =========================================================
+   21 - SAFETY LEGEND TABLE
+   Matches requested Healthy/Guard state table
+========================================================= */
+
+.safety-legend-card {
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+}
+
+.safety-legend-head,
+.safety-legend-row {
+  display: grid;
+  grid-template-columns: 1.22fr 0.9fr;
+  align-items: center;
+}
+
+.safety-legend-head {
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.safety-legend-head span {
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 950;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.safety-legend-head span:first-child,
+.safety-legend-row > span:first-child {
+  border-right: 1px solid var(--line);
+}
+
+.safety-legend-row {
+  min-height: 37px;
+  border-bottom: 1px solid var(--line);
+}
+
+.safety-legend-row:last-child {
+  border-bottom: none;
+}
+
+.safety-legend-row > span {
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.legend-meaning {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 900 !important;
+}
+
+.legend-icon.ready {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 4px;
+  background: rgba(34, 197, 94, 0.78);
+  color: white;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.legend-dot {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  display: inline-block;
+  border-radius: 999px;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.35), 0 2px 6px rgba(15, 23, 42, 0.15);
+}
+
+.legend-dot.warning {
+  background: #d6a318;
+}
+
+.legend-dot.danger {
+  background: #e11d48;
+}
+
+.legend-meaning.ready {
+  color: var(--green-dark) !important;
+}
+
+.legend-meaning.warning {
+  color: var(--yellow-dark) !important;
+}
+
+.legend-meaning.danger {
+  color: var(--red-dark) !important;
+}
+
+@media (max-width: 768px) {
+  .safety-legend-head span,
+  .safety-legend-row > span {
+    padding: 8px 9px;
+    font-size: 9px;
+  }
+
+  .legend-icon.ready,
+  .legend-dot {
+    width: 15px;
+    height: 15px;
+  }
+}

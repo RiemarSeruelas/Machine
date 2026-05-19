@@ -439,6 +439,8 @@ const machineRows = useMemo(() => {
             <div className="side-count">{machineRows.length}</div>
           </div>
 
+          <SafetyLegend />
+
           {/* UPDATE: NEEDS ATTENTION SECTION */}
           <div className="left-attention-card">
             <div className="attention-header">
@@ -723,6 +725,41 @@ const machineRows = useMemo(() => {
    16 - SMALL COMPONENTS
 ========================================================= */
 
+function SafetyLegend() {
+  return (
+    <div className="safety-legend-card">
+      <div className="safety-legend-head">
+        <span>State</span>
+        <span>Meaning</span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy ON + Guard ON</span>
+        <span className="legend-meaning ready">
+          <span className="legend-icon ready">✓</span>
+          Ready
+        </span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy OFF + Guard OFF</span>
+        <span className="legend-meaning warning">
+          <span className="legend-dot warning" />
+          Guard open
+        </span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy OFF + Guard ON</span>
+        <span className="legend-meaning danger">
+          <span className="legend-dot danger" />
+          Fault
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function SummaryStat({ value, label, variant }) {
   return (
     <div className={`summary-stat ${variant || ""}`}>
@@ -754,75 +791,73 @@ function getSafetyState(point) {
   const healthyOn = point.interlockOk === true;
   const guardOn = point.guardOpen === false;
 
+  // Requested final table:
+  // Healthy ON  + Guard ON  = Ready
+  // Healthy OFF + Guard OFF = Guard open
+  // Healthy OFF + Guard ON  = Fault
+  // Fallback: any Guard OFF condition still shows Guard open.
   if (healthyOn && guardOn) {
     return {
-      label: "READY",
+      label: "Ready",
       className: "safe",
     };
   }
 
   if (!healthyOn && !guardOn) {
     return {
-      label: "UNSAFE",
-      className: "danger",
+      label: "Guard open",
+      className: "warning",
     };
   }
 
   if (!healthyOn && guardOn) {
     return {
-      label: "INTERLOCK FAULT",
+      label: "Fault",
       className: "danger",
     };
   }
 
   if (healthyOn && !guardOn) {
     return {
-      label: "GUARD OPEN",
+      label: "Guard open",
       className: "warning",
     };
   }
 
   return {
-    label: "UNKNOWN",
+    label: "Unknown",
     className: "warning",
   };
 }
 
 function getZoneState(tags) {
-  const hasRedNotReady = tags.some((tag) => {
-    const healthyOn = tag.interlockOk === true;
-    const guardOn = tag.guardOpen === false;
-    return !healthyOn && !guardOn;
-  });
-
   const hasFault = tags.some((tag) => {
     const healthyOn = tag.interlockOk === true;
     const guardOn = tag.guardOpen === false;
     return !healthyOn && guardOn;
   });
 
-  const hasYellowNotReady = tags.some((tag) => {
-    const healthyOn = tag.interlockOk === true;
+  const hasGuardOpen = tags.some((tag) => {
     const guardOn = tag.guardOpen === false;
-    return healthyOn && !guardOn;
+    return !guardOn;
   });
 
-  if (hasRedNotReady || hasFault) {
+  if (hasFault) {
     return {
-      label: "INTERLOCK FAULT",
+      label: "Fault",
       className: "danger",
     };
   }
 
-  if (hasYellowNotReady) {
+  if (hasGuardOpen) {
     return {
-      label: "EXPOSED",
+      label: "Guard open",
       className: "warning",
     };
   }
 
   return {
-    label: "READY",
+    label: "Ready",
     className: "safe",
   };
 }
