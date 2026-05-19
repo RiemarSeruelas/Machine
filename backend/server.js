@@ -289,8 +289,12 @@ app.get("/health", (req, res) => {
     lastMessageAt,
   });
 });
- 
+
 app.get("/data", (req, res) => {
+  res.json(latestMachineData);
+});
+
+app.get("/api/data", (req, res) => {
   res.json(latestMachineData);
 });
  
