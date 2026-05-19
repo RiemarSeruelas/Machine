@@ -10,9 +10,9 @@ app.use(express.json());
  
 const PORT = Number(process.env.PORT || 5000);
  
-const MQTT_BROKER = process.env.MQTT_BROKER || "mqtt://10.156.116.176:1883";
-const MQTT_USERNAME = process.env.MQTT_USERNAME || "foodsbroker";
-const MQTT_PASSWORD = process.env.MQTT_PASSWORD || "Engineering@2024";
+const MQTT_BROKER = process.env.MQTT_BROKER;
+const MQTT_USERNAME = process.env.MQTT_USERNAME;
+const MQTT_PASSWORD = process.env.MQTT_PASSWORD;
 const MQTT_TOPIC = process.env.MQTT_TOPIC || "sensor/data";
  
 let mqttConnected = false;
