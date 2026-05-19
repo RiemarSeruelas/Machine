@@ -142,18 +142,19 @@ const MACHINE_CONFIGS = {
     name: "Mespack",
     title: "Mespack Command Center",
     subtitle: "Real-time guard and interlock status",
-    apiUrl: "http://localhost:5000/data",
+    apiUrl: "/api/data",
     image: machineImage,
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
   },
+  /* http://localhost:5000/data */
 
   /* machine2: {
     id: "machine2",
     name: "Machine 2",
     title: "Machine 2 Command Center",
     subtitle: "Real-time machine status monitoring",
-    apiUrl: "http://localhost:5000/data-machine2",
+    apiUrl: "/api/data-machine2",
     image: machineImage,
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
