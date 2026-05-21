@@ -148,7 +148,7 @@ function normalizeHighBytePayload(rawPayload) {
         diagnosticValue true  -> interlockOk false
         diagnosticValue false -> interlockOk true
     */
-    const diagnosticFault = door.diagnosticValue === true;
+    const diagnosticFault = door.diagnosticValue === false;
     const interlockOk = !diagnosticFault;
  
     flatTags[guardTag] = doorValue;
