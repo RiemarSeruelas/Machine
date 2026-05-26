@@ -242,10 +242,9 @@ const machineRows = useMemo(() => {
   return activeMachine.points.map((point) => {
     const liveDoor = liveDoorById.get(point.id);
 
-    // Preferred source: HighByte already calculates final status per door:
-    // OK / DIAGNOSTIC / OPEN.
-    // The dashboard should trust this instead of recalculating status from
-    // doorValue + diagnosticValue, otherwise doors 19-33 can become "Fault".
+    // Keep HighByte status for reference/details, but UI color is calculated
+    // from the requested truth table below:
+    // guard down/open wins as yellow; red is interlock down only while guard is good.
     const liveDoorStatus = normalizeStatus(liveDoor?.status);
 
     const liveGuardOnValue =
@@ -787,69 +786,30 @@ function DetailItem({ label, value, wide }) {
 ========================================================= */
 
 function getSafetyState(point) {
-  const status = normalizeStatus(point?.doorStatus || point?.status);
+  const interlockGood = point?.interlockOk === true;
+  const guardGood = point?.guardOpen === false;
 
-  // Preferred logic: use the HighByte-calculated status.
-  // Expected values from your payload:
-  // OK          = Ready
-  // DIAGNOSTIC  = Diagnostic / needs attention
-  // OPEN        = Guard Open / needs attention
-  if (status === "OK" || status === "READY") {
-    return {
-      label: "Ready",
-      className: "safe",
-    };
-  }
-
-  if (status === "DIAGNOSTIC") {
-    return {
-      label: "Diagnostic",
-      className: "warning",
-    };
-  }
-
-  if (status === "OPEN" || status === "GUARD OPEN") {
+  // Requested color logic:
+  // Green  = Ready              = interlock good + guard good
+  // Yellow = Guard Open         = guard down/open, regardless of interlock
+  // Red    = Interlock / Fault  = interlock down only while guard is good
+  if (!guardGood) {
     return {
       label: "Guard Open",
       className: "warning",
     };
   }
 
-  if (status === "FAULT") {
+  if (!interlockGood) {
     return {
-      label: "Fault",
-      className: "danger",
-    };
-  }
-
-  // Fallback only: used when the API has no doors[] status yet.
-  const healthyOn = point.interlockOk === true;
-  const guardOn = point.guardOpen === false;
-
-  if (healthyOn && guardOn) {
-    return {
-      label: "Ready",
-      className: "safe",
-    };
-  }
-
-  if (!guardOn) {
-    return {
-      label: "Guard Open",
-      className: "warning",
-    };
-  }
-
-  if (!healthyOn) {
-    return {
-      label: "Fault",
+      label: "Interlock",
       className: "danger",
     };
   }
 
   return {
-    label: "Unknown",
-    className: "warning",
+    label: "Ready",
+    className: "safe",
   };
 }
 
@@ -862,7 +822,7 @@ function getZoneState(tags) {
 
   if (dangerCount > 0) {
     return {
-      label: `${dangerCount} Fault`,
+      label: `${dangerCount} Interlock`,
       className: "danger",
       dangerCount,
       warningCount,
@@ -872,7 +832,7 @@ function getZoneState(tags) {
 
   if (warningCount > 0) {
     return {
-      label: `${warningCount} Attention`,
+      label: `${warningCount} Guard Open`,
       className: "warning",
       dangerCount,
       warningCount,
