@@ -31,3 +31,111 @@ if (healthyOn && guardOn) {
     className: "warning",
   };
 }
+
+let interlocks = {{Connection.OPC_Server.Dressings_OMRON_NJ_Mespack_Filler_Interlocks}};
+ 
+let doorNames = {
+  1: "Unwinder Door 1",
+  2: "Unwinder Door 2",
+  3: "Machine Door 3",
+  4: "Machine Door 4",
+  5: "Machine Door 5",
+  6: "Machine Door 6",
+  7: "Machine Door 7",
+  8: "Machine Door 8",
+  9: "Machine Door 9",
+  10: "Machine Door 10",
+  11: "Machine Door 11",
+  12: "Machine Door 12",
+  13: "Unwinder Door 13",
+  14: "Unwinder Door 14",
+  15: "Unwinder Door 15",
+  16: "Unwinder Door 16",
+  17: "Unwinder Door 17",
+  18: "Unwinder Door 18",
+  19: "Unwinder Door 19",
+  20: "Unwinder Door 20",
+  21: "Machine Door 21",
+  22: "Door 22",
+  23: "Door 23",
+  24: "Door 24",
+  25: "Door 25",
+  26: "Door 26",
+  27: "Door 27",
+  28: "Door 28",
+  29: "Door 29",
+  30: "Door 30",
+  31: "Door 31",
+  32: "Door 32",
+  33: "Door 33",
+  34: "Unwinder Door 34",
+  35: "Unwinder Door 35",
+  36: "Unwinder Door 36",
+  37: "Unwinder Door 37",
+  38: "Unwinder Door 38",
+  39: "Unwinder Door 39"
+};
+ 
+let doors = [];
+ 
+for (let i = 1; i <= 39; i++) {
+  let doorValue = interlocks["SFI_Door" + i];
+  let diagnosticValue = interlocks["I_Door" + i + "Diagnostic"];
+ 
+  let status = "OK";
+ 
+  if (diagnosticValue === true) {
+    status = "DIAGNOSTIC";
+  } else if (doorValue !== true) {
+    status = "OPEN";
+  }
+ 
+  doors.push({
+    doorNo: String(i).padStart(2, "0"),
+    doorName: doorNames[i],
+    doorTagName: "SFI_Door" + i,
+    diagnosticTagName: "I_Door" + i + "Diagnostic",
+    doorValue: doorValue,
+    diagnosticValue: diagnosticValue,
+    status: status
+  });
+}
+ 
+return JSON.stringify(doors);
+
+let interlocks = {{Connection.OPC_Server.Dressings_OMRON_NJ_Mespack_Filler_Interlocks}};
+
+for (let i = 1; i <= 39; i++) {
+  if (interlocks["I_Door" + i + "Diagnostic"] === true) {
+    return "DIAGNOSTIC";
+  }
+ 
+  if (interlocks["SFI_Door" + i] !== true) {
+    return "GUARD OPEN";
+  }
+}
+ 
+return "READY";
+
+let interlocks = {{Connection.OPC_Server.Dressings_OMRON_NJ_Mespack_Filler_Interlocks}};
+ 
+let count = 0;
+ 
+for (let i = 1; i <= 39; i++) {
+  if (interlocks["SFI_Door" + i] !== true) {
+    count++;
+  }
+}
+ 
+return count;
+
+let interlocks =  {{Connection.OPC_Server.Dressings_OMRON_NJ_Mespack_Filler_Interlocks}};
+let count = 0;
+ 
+for (let i = 1; i <= 39; i++) {
+  if (interlocks["I_Door" + i + "Diagnostic"] === true) {
+    count++;
+  }
+}
+ 
+return count;
