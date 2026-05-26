@@ -758,21 +758,14 @@ function getSafetyState(point) {
     };
   }
 
-  if (!healthyOn && !guardOn) {
-    return {
-      label: "Guard open",
-      className: "warning",
-    };
-  }
-
-  if (!healthyOn && guardOn) {
+  if (!guardOn) {
     return {
       label: "Guard Open",
       className: "warning",
     };
   }
 
-  if (healthyOn && !guardOn) {
+  if (!healthyOn) {
     return {
       label: "Fault",
       className: "danger",
