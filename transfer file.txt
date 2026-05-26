@@ -1,18 +1,28 @@
-{
-	"area": [
-		"Dressings"
-	],
-	"machine": [
-		"Mespack Filler"
-	],
-	"doors": "[{\"doorNo\":\"01\",\"doorName\":\"Unwinder Door 1\",\"doorTagName\":\"SFI_Door1\",\"diagnosticTagName\":\"I_Door1Diagnostic\",\"doorValue\":true,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"02\",\"doorName\":\"Unwinder Door 2\",\"doorTagName\":\"SFI_Door2\",\"diagnosticTagName\":\"I_Door2Diagnostic\",\"doorValue\":true,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"03\",\"doorName\":\"Machine Door 3\",\"doorTagName\":\"SFI_Door3\",\"diagnosticTagName\":\"I_Door3Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"04\",\"doorName\":\"Machine Door 4\",\"doorTagName\":\"SFI_Door4\",\"diagnosticTagName\":\"I_Door4Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"05\",\"doorName\":\"Machine Door 5\",\"doorTagName\":\"SFI_Door5\",\"diagnosticTagName\":\"I_Door5Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"06\",\"doorName\":\"Machine Door 6\",\"doorTagName\":\"SFI_Door6\",\"diagnosticTagName\":\"I_Door6Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"07\",\"doorName\":\"Machine Door 7\",\"doorTagName\":\"SFI_Door7\",\"diagnosticTagName\":\"I_Door7Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"08\",\"doorName\":\"Machine Door 8\",\"doorTagName\":\"SFI_Door8\",\"diagnosticTagName\":\"I_Door8Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"09\",\"doorName\":\"Machine Door 9\",\"doorTagName\":\"SFI_Door9\",\"diagnosticTagName\":\"I_Door9Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"10\",\"doorName\":\"Machine Door 10\",\"doorTagName\":\"SFI_Door10\",\"diagnosticTagName\":\"I_Door10Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"11\",\"doorName\":\"Machine Door 11\",\"doorTagName\":\"SFI_Door11\",\"diagnosticTagName\":\"I_Door11Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"12\",\"doorName\":\"Machine Door 12\",\"doorTagName\":\"SFI_Door12\",\"diagnosticTagName\":\"I_Door12Diagnostic\",\"doorValue\":false,\"diagnosticValue\":false,\"status\":\"OPEN\"},{\"doorNo\":\"13\",\"doorName\":\"Unwinder Door 13\",\"doorTagName\":\"SFI_Door13\",\"diagnosticTagName\":\"I_Door13Diagnostic\",\"doorValue\":false,\"diagnosticValue\":false,\"status\":\"OPEN\"},{\"doorNo\":\"14\",\"doorName\":\"Unwinder Door 14\",\"doorTagName\":\"SFI_Door14\",\"diagnosticTagName\":\"I_Door14Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"15\",\"doorName\":\"Unwinder Door 15\",\"doorTagName\":\"SFI_Door15\",\"diagnosticTagName\":\"I_Door15Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"16\",\"doorName\":\"Unwinder Door 16\",\"doorTagName\":\"SFI_Door16\",\"diagnosticTagName\":\"I_Door16Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"17\",\"doorName\":\"Unwinder Door 17\",\"doorTagName\":\"SFI_Door17\",\"diagnosticTagName\":\"I_Door17Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"18\",\"doorName\":\"Unwinder Door 18\",\"doorTagName\":\"SFI_Door18\",\"diagnosticTagName\":\"I_Door18Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"19\",\"doorName\":\"Unwinder Door 19\",\"doorTagName\":\"SFI_Door19\",\"diagnosticTagName\":\"I_Door19Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"20\",\"doorName\":\"Unwinder Door 20\",\"doorTagName\":\"SFI_Door20\",\"diagnosticTagName\":\"I_Door20Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"21\",\"doorName\":\"Machine Door 21\",\"doorTagName\":\"SFI_Door21\",\"diagnosticTagName\":\"I_Door21Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"22\",\"doorName\":\"Door 22\",\"doorTagName\":\"SFI_Door22\",\"diagnosticTagName\":\"I_Door22Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"23\",\"doorName\":\"Door 23\",\"doorTagName\":\"SFI_Door23\",\"diagnosticTagName\":\"I_Door23Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"24\",\"doorName\":\"Door 24\",\"doorTagName\":\"SFI_Door24\",\"diagnosticTagName\":\"I_Door24Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"25\",\"doorName\":\"Door 25\",\"doorTagName\":\"SFI_Door25\",\"diagnosticTagName\":\"I_Door25Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"26\",\"doorName\":\"Door 26\",\"doorTagName\":\"SFI_Door26\",\"diagnosticTagName\":\"I_Door26Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"27\",\"doorName\":\"Door 27\",\"doorTagName\":\"SFI_Door27\",\"diagnosticTagName\":\"I_Door27Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"28\",\"doorName\":\"Door 28\",\"doorTagName\":\"SFI_Door28\",\"diagnosticTagName\":\"I_Door28Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"29\",\"doorName\":\"Door 29\",\"doorTagName\":\"SFI_Door29\",\"diagnosticTagName\":\"I_Door29Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"30\",\"doorName\":\"Door 30\",\"doorTagName\":\"SFI_Door30\",\"diagnosticTagName\":\"I_Door30Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"31\",\"doorName\":\"Door 31\",\"doorTagName\":\"SFI_Door31\",\"diagnosticTagName\":\"I_Door31Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"32\",\"doorName\":\"Door 32\",\"doorTagName\":\"SFI_Door32\",\"diagnosticTagName\":\"I_Door32Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"33\",\"doorName\":\"Door 33\",\"doorTagName\":\"SFI_Door33\",\"diagnosticTagName\":\"I_Door33Diagnostic\",\"doorValue\":true,\"diagnosticValue\":false,\"status\":\"OK\"},{\"doorNo\":\"34\",\"doorName\":\"Unwinder Door 34\",\"doorTagName\":\"SFI_Door34\",\"diagnosticTagName\":\"I_Door34Diagnostic\",\"doorValue\":true,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"35\",\"doorName\":\"Unwinder Door 35\",\"doorTagName\":\"SFI_Door35\",\"diagnosticTagName\":\"I_Door35Diagnostic\",\"doorValue\":true,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"36\",\"doorName\":\"Unwinder Door 36\",\"doorTagName\":\"SFI_Door36\",\"diagnosticTagName\":\"I_Door36Diagnostic\",\"doorValue\":true,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"37\",\"doorName\":\"Unwinder Door 37\",\"doorTagName\":\"SFI_Door37\",\"diagnosticTagName\":\"I_Door37Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"38\",\"doorName\":\"Unwinder Door 38\",\"doorTagName\":\"SFI_Door38\",\"diagnosticTagName\":\"I_Door38Diagnostic\",\"doorValue\":true,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"},{\"doorNo\":\"39\",\"doorName\":\"Unwinder Door 39\",\"doorTagName\":\"SFI_Door39\",\"diagnosticTagName\":\"I_Door39Diagnostic\",\"doorValue\":false,\"diagnosticValue\":true,\"status\":\"DIAGNOSTIC\"}]",
-	"overallStatus": [
-		"DIAGNOSTIC"
-	],
-	"openDoorCount": [
-		22
-	],
-	"diagnosticCount": [
-		22
-	]
+let interlocks = {{Connection.OPC_Server.Dressings_OMRON_NJ_Mespack_Filler_Interlocks}};
+
+let count = 0;
+
+for (let i = 1; i <= 39; i++) {
+  let doorValue = interlocks["SFI_Door" + i];
+  let diagnosticValue = interlocks["I_Door" + i + "Diagnostic"];
+
+  if (diagnosticValue !== true && doorValue !== true) {
+    count++;
+  }
 }
+
+return count;
+=======================================
+=================================
+
+let interlocks = {{Connection.OPC_Server.Dressings_OMRON_NJ_Mespack_Filler_Interlocks}};
+
+let count = 0;
+
+for (let i = 1; i <= 39; i++) {
+  if (interlocks["I_Door" + i + "Diagnostic"] === true) {
+    count++;
+  }
+}
+
+return count;
