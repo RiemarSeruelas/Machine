@@ -202,8 +202,28 @@ export default function App() {
     return () => clearInterval(interval);
   }, [activeMachineId]);
 
-  const status = machineData?.status || "WAITING";
-  const payload = machineData?.data || {};
+  const payload = machineData?.data || machineData || {};
+  const status = normalizeStatus(machineData?.status || payload?.overallStatus || "WAITING");
+
+  const liveDoors = useMemo(() => {
+    return parseDoors(payload?.doors);
+  }, [payload?.doors]);
+
+  const liveDoorById = useMemo(() => {
+    const map = new Map();
+
+    liveDoors.forEach((door) => {
+      const id =
+        Number(door?.doorNo) ||
+        Number(String(door?.doorTagName || "").replace(/\D/g, ""));
+
+      if (id) {
+        map.set(id, door);
+      }
+    });
+
+    return map;
+  }, [liveDoors]);
 
  /* =========================================================
    04 - BUILD LIVE MACHINE ROWS
@@ -220,8 +240,21 @@ export default function App() {
 
 const machineRows = useMemo(() => {
   return activeMachine.points.map((point) => {
-    const liveGuardOnValue = payload?.[point.guardTag];
-    const liveHealthyValue = payload?.[point.interlockTag];
+    const liveDoor = liveDoorById.get(point.id);
+
+    // Preferred source: HighByte already calculates final status per door:
+    // OK / DIAGNOSTIC / OPEN.
+    // The dashboard should trust this instead of recalculating status from
+    // doorValue + diagnosticValue, otherwise doors 19-33 can become "Fault".
+    const liveDoorStatus = normalizeStatus(liveDoor?.status);
+
+    const liveGuardOnValue =
+      liveDoor?.doorValue !== undefined ? liveDoor.doorValue : payload?.[point.guardTag];
+
+    const liveHealthyValue =
+      liveDoor?.diagnosticValue !== undefined
+        ? liveDoor.diagnosticValue
+        : payload?.[point.interlockTag];
 
     const guardOn =
       liveGuardOnValue === undefined
@@ -236,16 +269,17 @@ const machineRows = useMemo(() => {
     return {
       ...point,
 
-      // Convert Guard ON into guardOpen
-      // Guard ON true  = guardOpen false
-      // Guard ON false = guardOpen true
-      guardOpen: !guardOn,
+      // Keep raw/live values for the details modal.
+      doorValue: liveGuardOnValue,
+      diagnosticValue: liveHealthyValue,
+      doorStatus: liveDoorStatus,
 
-      // Healthy signal maps directly
+      // Old booleans are still kept as fallback only.
+      guardOpen: !guardOn,
       interlockOk: healthyOn,
     };
   });
-}, [payload, activeMachine]);
+}, [payload, activeMachine, liveDoorById]);
 
   /* ====================================================   =====
      05 - LEFT PANEL ATTENTION LOGIC
@@ -664,12 +698,16 @@ const machineRows = useMemo(() => {
                 <DetailItem label="Point No." value={selectedPoint.id} />
                 <DetailItem label="Status" value={selectedPoint.state.label} />
                 <DetailItem
-                  label="Guard"
-                  value={selectedPoint.guardOpen ? "OPEN" : "CLOSED"}
+                  label="HighByte Status"
+                  value={selectedPoint.doorStatus || selectedPoint.state.label}
                 />
                 <DetailItem
-                  label="Interlock"
-                  value={selectedPoint.interlockOk ? "OK" : "FAULT"}
+                  label="Guard Raw"
+                  value={String(selectedPoint.doorValue ?? "N/A")}
+                />
+                <DetailItem
+                  label="Diagnostic Raw"
+                  value={String(selectedPoint.diagnosticValue ?? "N/A")}
                 />
                 <DetailItem label="Guard Tag" value={selectedPoint.guardTag} wide />
                 <DetailItem
@@ -749,8 +787,45 @@ function DetailItem({ label, value, wide }) {
 ========================================================= */
 
 function getSafetyState(point) {
+  const status = normalizeStatus(point?.doorStatus || point?.status);
+
+  // Preferred logic: use the HighByte-calculated status.
+  // Expected values from your payload:
+  // OK          = Ready
+  // DIAGNOSTIC  = Diagnostic / needs attention
+  // OPEN        = Guard Open / needs attention
+  if (status === "OK" || status === "READY") {
+    return {
+      label: "Ready",
+      className: "safe",
+    };
+  }
+
+  if (status === "DIAGNOSTIC") {
+    return {
+      label: "Diagnostic",
+      className: "warning",
+    };
+  }
+
+  if (status === "OPEN" || status === "GUARD OPEN") {
+    return {
+      label: "Guard Open",
+      className: "warning",
+    };
+  }
+
+  if (status === "FAULT") {
+    return {
+      label: "Fault",
+      className: "danger",
+    };
+  }
+
+  // Fallback only: used when the API has no doors[] status yet.
   const healthyOn = point.interlockOk === true;
   const guardOn = point.guardOpen === false;
+
   if (healthyOn && guardOn) {
     return {
       label: "Ready",
@@ -797,7 +872,7 @@ function getZoneState(tags) {
 
   if (warningCount > 0) {
     return {
-      label: `${warningCount} Guard Open`,
+      label: `${warningCount} Attention`,
       className: "warning",
       dangerCount,
       warningCount,
@@ -817,6 +892,26 @@ function getZoneState(tags) {
 /* =========================================================
    18 - UTILS
 ========================================================= */
+
+function parseDoors(value) {
+  if (Array.isArray(value)) return value;
+
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+function normalizeStatus(value) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return String(raw || "").trim().toUpperCase();
+}
 
 function getStatusClass(status) {
   if (status === "READY") return "running";
