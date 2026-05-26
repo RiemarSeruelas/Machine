@@ -9,15 +9,16 @@ export default defineConfig({
     babel({ presets: [reactCompilerPreset()] })
   ],
 
+  plugins: [react()],
   server: {
     host: "0.0.0.0",
-    port: 5178,
+    port: 5173,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:5000",
+        target: "http://10.156.118.29:5000",
         changeOrigin: true,
         secure: false,
-  },
-},
+      },
+    },
   },
 })

@@ -1,25 +1,40 @@
-Error: connect ECONNREFUSED 127.0.0.1:5000
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1645:16)
-10:41:06 AM [vite] http proxy error: /api/data
-Error: connect ECONNREFUSED 127.0.0.1:5000
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1645:16) (x2)
-10:41:06 AM [vite] http proxy error: /api/data
-Error: connect ECONNREFUSED 127.0.0.1:5000
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1645:16) (x3)
-10:41:06 AM [vite] http proxy error: /api/data
-Error: connect ECONNREFUSED 127.0.0.1:5000
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1645:16) (x4)
-10:41:07 AM [vite] http proxy error: /api/data
-Error: connect ECONNREFUSED 127.0.0.1:5000
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1645:16) (x5)
-10:41:08 AM [vite] http proxy error: /api/data
-Error: connect ECONNREFUSED 127.0.0.1:5000
-    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1645:16) (x6)
+App.jsx:181  GET http://10.156.118.29:5173/api/data net::ERR_ABORTED 502 (Bad Gateway)
+(anonymous) @ App.jsx:181
+(anonymous) @ App.jsx:199
+react_stack_bottom_frame @ react-dom-client.development.js:25989
+runWithFiberInDEV @ react-dom-client.development.js:871
+commitHookEffectListMount @ react-dom-client.development.js:13249
+commitHookPassiveMountEffects @ react-dom-client.development.js:13336
+commitPassiveMountOnFiber @ react-dom-client.development.js:15484
+recursivelyTraversePassiveMountEffects @ react-dom-client.development.js:15439
+commitPassiveMountOnFiber @ react-dom-client.development.js:15718
+recursivelyTraversePassiveMountEffects @ react-dom-client.development.js:15439
+commitPassiveMountOnFiber @ react-dom-client.development.js:15519
+flushPassiveEffects @ react-dom-client.development.js:18432
+(anonymous) @ react-dom-client.development.js:17923
+performWorkUntilDeadline @ scheduler.development.js:45
+<App>
+(anonymous) @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.jsx:8
 
-    AJSJAJJA
-    rbgtbtngeg
-
-
-
-
-gegeg
+App.jsx:181  GET http://10.156.118.29:5173/api/data net::ERR_ABORTED 502 (Bad Gateway)
+(anonymous) @ App.jsx:181
+(anonymous) @ App.jsx:199
+react_stack_bottom_frame @ react-dom-client.development.js:25989
+runWithFiberInDEV @ react-dom-client.development.js:871
+commitHookEffectListMount @ react-dom-client.development.js:13249
+commitHookPassiveMountEffects @ react-dom-client.development.js:13336
+reconnectPassiveEffects @ react-dom-client.development.js:15832
+recursivelyTraverseReconnectPassiveEffects @ react-dom-client.development.js:15784
+reconnectPassiveEffects @ react-dom-client.development.js:15885
+doubleInvokeEffectsOnFiber @ react-dom-client.development.js:18703
+runWithFiberInDEV @ react-dom-client.development.js:871
+recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom-client.development.js:18667
+commitDoubleInvokeEffectsInDEV @ react-dom-client.development.js:18712
+flushPassiveEffects @ react-dom-client.development.js:18439
+(anonymous) @ react-dom-client.development.js:17923
+performWorkUntilDeadline @ scheduler.development.js:45
+<App>
+(anonymous) @ react-jsx-dev-runtime.development.js:335
+(anonymous) @ main.jsx:8
+App.jsx:181  GET http://10.156.118.29:5173/api/data net::ERR_ABORTED 502 (Bad Gateway)
