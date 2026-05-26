@@ -746,22 +746,11 @@ function DetailItem({ label, value, wide }) {
 
 /* =========================================================
    17 - STATUS LOGIC
-   Your final mapping:
-   Healthy ON  + Guard ON  = READY / Green
-   Healthy OFF + Guard OFF = NOT READY / Red
-   Healthy OFF + Guard ON  = FAULT / Red
-   Healthy ON  + Guard OFF = NOT READY / Yellow
 ========================================================= */
 
 function getSafetyState(point) {
   const healthyOn = point.interlockOk === true;
   const guardOn = point.guardOpen === false;
-
-  // Requested final table:
-  // Healthy ON  + Guard ON  = Ready
-  // Healthy OFF + Guard OFF = Guard open
-  // Healthy OFF + Guard ON  = Fault
-  // Fallback: any Guard OFF condition still shows Guard open.
   if (healthyOn && guardOn) {
     return {
       label: "Ready",
@@ -778,15 +767,15 @@ function getSafetyState(point) {
 
   if (!healthyOn && guardOn) {
     return {
-      label: "Fault",
-      className: "danger",
+      label: "Guard Open",
+      className: "warning",
     };
   }
 
   if (healthyOn && !guardOn) {
     return {
-      label: "Guard open",
-      className: "warning",
+      label: "Fault",
+      className: "danger",
     };
   }
 

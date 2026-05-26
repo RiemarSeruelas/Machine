@@ -1,17 +1,33 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+if (healthyOn && guardOn) {
+    return {
+      label: "Ready",
+      className: "safe",
+    };
+  }
 
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: "0.0.0.0",
-    port: 5173,
-    proxy: {
-      "/api": {
-        target: "http://10.156.118.29:5000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-});
+  if (!healthyOn && !guardOn) {
+    return {
+      label: "Guard open",
+      className: "warning",
+    };
+  }
+
+  if (!healthyOn && guardOn) {
+    return {
+      label: "Guard Open",
+      className: "warning",
+    };
+  }
+
+  if (healthyOn && !guardOn) {
+    return {
+      label: "Fault",
+      className: "danger",
+    };
+  }
+
+  return {
+    label: "Unknown",
+    className: "warning",
+  };
+}
