@@ -786,34 +786,38 @@ function getSafetyState(point) {
 }
 
 function getZoneState(tags) {
-  const hasFault = tags.some((tag) => {
-    const healthyOn = tag.interlockOk === true;
-    const guardOn = tag.guardOpen === false;
-    return !healthyOn && guardOn;
-  });
+  const states = tags.map((tag) => getSafetyState(tag));
 
-  const hasGuardOpen = tags.some((tag) => {
-    const guardOn = tag.guardOpen === false;
-    return !guardOn;
-  });
+  const dangerCount = states.filter((state) => state.className === "danger").length;
+  const warningCount = states.filter((state) => state.className === "warning").length;
+  const safeCount = states.filter((state) => state.className === "safe").length;
 
-  if (hasFault) {
+  if (dangerCount > 0) {
     return {
-      label: "Fault",
+      label: `${dangerCount} Fault`,
       className: "danger",
+      dangerCount,
+      warningCount,
+      safeCount,
     };
   }
 
-  if (hasGuardOpen) {
+  if (warningCount > 0) {
     return {
-      label: "Guard open",
+      label: `${warningCount} Guard Open`,
       className: "warning",
+      dangerCount,
+      warningCount,
+      safeCount,
     };
   }
 
   return {
     label: "Ready",
     className: "safe",
+    dangerCount,
+    warningCount,
+    safeCount,
   };
 }
 
