@@ -80,7 +80,7 @@ const MACHINE_ZONES = [
     labelY: "73%",
     zoomScale: 2.45,
     detailImage: zoneMainRealistic,
-    tagIds: [1, 2, 26, 36],
+    tagIds: [1, 2, 3, 39, 38, 37, 36, 35, 34],
   }, 
   {
     id: "zone-wrapper",
@@ -91,7 +91,7 @@ const MACHINE_ZONES = [
     labelY: "63%",
     zoomScale: 2.1,
     detailImage: zoneMainRealistic,
-    tagIds: [3, 4, 5, 6, 7, 27, 28, 29],
+    tagIds: [4, 5, 6, 7, 8, 9, 33, 32, 31, 30, 29, 28],
   },
   {
     id: "zone-main",
@@ -102,18 +102,7 @@ const MACHINE_ZONES = [
     labelY: "55%",
     zoomScale: 2,
     detailImage: zoneMainRealistic,
-    tagIds: [8, 9, 10, 11, 30, 31, 37],
-  },
-  {
-    id: "zone-loader",
-    name: "Top Loader",
-    area: "Top Loader",
-    points: "58,34 61,32 65,10 66.3,10 68.5,14 72,13 77,23 77,30 58,39 ",
-    labelX: "65%",
-    labelY: "25%",
-    zoomScale: 2.4,
-    detailImage: zoneMainRealistic,
-    tagIds: [12, 13, 14, 15, 38],
+    tagIds: [10, 11, 12, 13, 27, 26, 25, 24],
   },
    {
     id: "zone-center",
@@ -124,18 +113,7 @@ const MACHINE_ZONES = [
     labelY: "49%",
     zoomScale: 2.15,
     detailImage: zoneMainRealistic,
-    tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
-  }, 
-  {
-    id: "zone-outfeed",
-    name: "Outfeed",
-    area: "Outfeed Section",
-    points: "88,48 91,46 95,50 95,60 91,60 88,56",
-    labelX: "94%",
-    labelY: "57%",
-    zoomScale: 2.5,
-    detailImage: zoneMainRealistic,
-    tagIds: [24, 25, 35, 39],
+    tagIds: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
   }, 
 ];
 
@@ -160,14 +138,14 @@ const MACHINE_ZONES = [
 const MACHINE_3D_ZONE_MAPS = [
   {
     id: "zone-infeed",
-    position: [-1.52, -0.23, -0.18],
-    size: [0.67, 0.51, 0.62],
+    position: [-1.54, -0.23, -0.18],
+    size: [0.67, 0.54, 0.64],
     rotation: [0, 0, 0],
     labelOffset: [0, 1000.5, 0],
     labelWidth: 0.92,
     labelHeight: 0.24,
     labelTextSize: 0.13,
-    opacity: 0.16,
+    opacity: 0.50,
     activeOpacity: 0.26,
   }, 
   {
@@ -179,7 +157,7 @@ const MACHINE_3D_ZONE_MAPS = [
     labelWidth: 1.05,
     labelHeight: 0.24,
     labelTextSize: 0.13,
-    opacity: 0.16,
+    opacity: 0.50,
     activeOpacity: 0.26,
   }, 
   {
@@ -191,7 +169,7 @@ const MACHINE_3D_ZONE_MAPS = [
     labelWidth: 1.20,
     labelHeight: 0.24,
     labelTextSize: 0.13,
-    opacity: 0.16,
+    opacity: 0.50,
     activeOpacity: 0.26,
   }, 
   
@@ -204,7 +182,7 @@ const MACHINE_3D_ZONE_MAPS = [
     labelWidth: 1.45,
     labelHeight: 0.24,
     labelTextSize: 0.13,
-    opacity: 0.16,
+    opacity: 0.50,
     activeOpacity: 0.26,
   },
   
