@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import machineImage from "./assets/machine.png";
 import zoneMainRealistic from "./assets/zone.png";
+import { Canvas } from "@react-three/fiber";
+import { Billboard, Edges, OrbitControls, Text, useGLTF } from "@react-three/drei";
 
 /* =========================================================
    01 - MACHINE POINTS / TAG CONFIG
@@ -77,8 +79,8 @@ const MACHINE_ZONES = [
     labelY: "73%",
     zoomScale: 2.45,
     detailImage: zoneMainRealistic,
-    tagIds: [1, 2, 3, 39, 38, 37, 36, 35, 34],
-  },
+    tagIds: [1, 2, 26, 36],
+  }, 
   {
     id: "zone-wrapper",
     name: "Wrapping",
@@ -88,7 +90,7 @@ const MACHINE_ZONES = [
     labelY: "63%",
     zoomScale: 2.1,
     detailImage: zoneMainRealistic,
-    tagIds: [4, 5, 6, 7, 8, 9, 33, 32, 31, 30, 29, 28],
+    tagIds: [3, 4, 5, 6, 7, 27, 28, 29],
   },
   {
     id: "zone-main",
@@ -99,7 +101,18 @@ const MACHINE_ZONES = [
     labelY: "55%",
     zoomScale: 2,
     detailImage: zoneMainRealistic,
-    tagIds: [10, 11, 12, 13, 14, 27, 26, 25, 24],
+    tagIds: [8, 9, 10, 11, 30, 31, 37],
+  },
+  {
+    id: "zone-loader",
+    name: "Top Loader",
+    area: "Top Loader",
+    points: "58,34 61,32 65,10 66.3,10 68.5,14 72,13 77,23 77,30 58,39 ",
+    labelX: "65%",
+    labelY: "25%",
+    zoomScale: 2.4,
+    detailImage: zoneMainRealistic,
+    tagIds: [12, 13, 14, 15, 38],
   },
    {
     id: "zone-center",
@@ -110,65 +123,115 @@ const MACHINE_ZONES = [
     labelY: "49%",
     zoomScale: 2.15,
     detailImage: zoneMainRealistic,
-    tagIds: [15, 16, 17, 18, 19, 20, 21, 22, 23],
-  },  
+    tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
+  }, 
+  {
+    id: "zone-outfeed",
+    name: "Outfeed",
+    area: "Outfeed Section",
+    points: "88,48 91,46 95,50 95,60 91,60 88,56",
+    labelX: "94%",
+    labelY: "57%",
+    zoomScale: 2.5,
+    detailImage: zoneMainRealistic,
+    tagIds: [24, 25, 35, 39],
+  }, 
 ];
+
 
 
 /* =========================================================
-   03 - 3D POINT POSITIONS
-   Adjust these later to line up with your real 3D model.
+   03 - 3D ZONE WRAP SETTINGS
+   These are the 3D wrapped areas that sit on top of the GLB.
 
-   Coordinates are percentages inside the 3D panel:
-     x = left/right position
-     y = up/down position
-     z = visual depth layer only for styling/order
+   Edit these manually to map each colored area around the machine:
+     position = [left/right, up/down, front/back]
+     size     = [width, height, depth]
+     rotation = [x, y, z] in radians
+     labelOffset = move the floating label relative to the box center
 
-   When you replace the placeholder with a real GLB model, keep the same
-   ids so the live door status still maps to the correct marker.
+   Tips:
+   - start by fixing position first
+   - then adjust size so the colored box wraps the section
+   - only use rotation if the box needs to tilt with the machine section
 ========================================================= */
 
-const MACHINE_3D_POINTS = [
-  { id: 1, x: 10, y: 60, z: 0 },
-  { id: 2, x: 13, y: 66, z: 0 },
-  { id: 3, x: 23, y: 58, z: 1 },
-  { id: 4, x: 27, y: 55, z: 1 },
-  { id: 5, x: 31, y: 52, z: 1 },
-  { id: 6, x: 35, y: 50, z: 1 },
-  { id: 7, x: 39, y: 48, z: 1 },
-  { id: 8, x: 47, y: 44, z: 2 },
-  { id: 9, x: 51, y: 42, z: 2 },
-  { id: 10, x: 55, y: 40, z: 2 },
-  { id: 11, x: 59, y: 38, z: 2 },
-  { id: 12, x: 55, y: 20, z: 3 },
-  { id: 13, x: 58, y: 17, z: 3 },
-  { id: 14, x: 62, y: 15, z: 3 },
-  { id: 15, x: 66, y: 17, z: 3 },
-  { id: 16, x: 70, y: 31, z: 2 },
-  { id: 17, x: 74, y: 29, z: 2 },
-  { id: 18, x: 78, y: 30, z: 2 },
-  { id: 19, x: 81, y: 34, z: 2 },
-  { id: 20, x: 84, y: 38, z: 2 },
-  { id: 21, x: 69, y: 45, z: 2 },
-  { id: 22, x: 73, y: 47, z: 2 },
-  { id: 23, x: 77, y: 49, z: 2 },
-  { id: 24, x: 89, y: 51, z: 1 },
-  { id: 25, x: 92, y: 55, z: 1 },
-  { id: 26, x: 17, y: 74, z: 0 },
-  { id: 27, x: 33, y: 64, z: 1 },
-  { id: 28, x: 38, y: 61, z: 1 },
-  { id: 29, x: 43, y: 58, z: 1 },
-  { id: 30, x: 57, y: 55, z: 2 },
-  { id: 31, x: 62, y: 52, z: 2 },
-  { id: 32, x: 80, y: 54, z: 2 },
-  { id: 33, x: 84, y: 57, z: 2 },
-  { id: 34, x: 76, y: 63, z: 1 },
-  { id: 35, x: 91, y: 64, z: 1 },
-  { id: 36, x: 21, y: 82, z: 0 },
-  { id: 37, x: 61, y: 71, z: 1 },
-  { id: 38, x: 66, y: 27, z: 3 },
-  { id: 39, x: 94, y: 68, z: 1 },
+const MACHINE_3D_ZONE_MAPS = [
+  {
+    id: "zone-infeed",
+    position: [-1.52, -0.23, -0.18],
+    size: [0.67, 0.51, 0.62],
+    rotation: [0, 0, 0],
+    labelOffset: [0, 1000.5, 0],
+    labelWidth: 0.92,
+    labelHeight: 0.24,
+    labelTextSize: 0.13,
+    opacity: 0.16,
+    activeOpacity: 0.26,
+  }, 
+  {
+    id: "zone-wrapper",
+    position: [-0.25, -0.27, -0.17],
+    size: [1.26, 0.50, 0.35],
+    rotation: [0, 0, 0],
+    labelOffset: [0, 100.84, 0],
+    labelWidth: 1.05,
+    labelHeight: 0.24,
+    labelTextSize: 0.13,
+    opacity: 0.16,
+    activeOpacity: 0.26,
+  }, 
+  {
+    id: "zone-main",
+    position: [0.83, -0.27, -0.18],
+    size: [0.86, 0.50, 0.37],
+    rotation: [0, 0, 0],
+    labelOffset: [0, 100.86, 0],
+    labelWidth: 1.20,
+    labelHeight: 0.24,
+    labelTextSize: 0.13,
+    opacity: 0.16,
+    activeOpacity: 0.26,
+  }, 
+  
+  {
+    id: "zone-center",
+    position: [1.73, -0.27, -0.17],
+    size: [0.97, 0.50, 0.35],
+    rotation: [0, 0, 0],
+    labelOffset: [0, 100.02, 0],
+    labelWidth: 1.45,
+    labelHeight: 0.24,
+    labelTextSize: 0.13,
+    opacity: 0.16,
+    activeOpacity: 0.26,
+  },
+  
 ];
+
+/* =========================================================
+   04 - 3D MODEL VIEW SETTINGS
+   Use this when you want to zoom/resize/rotate the whole GLB.
+========================================================= */
+
+const MACHINE_3D_MODEL_SETTINGS = {
+  // Higher number = bigger model.
+  scale: 2.35,
+
+  // Move whole model in 3D space: [left/right, up/down, front/back]
+  position: [0, -0.55, 0],
+
+  // Rotate whole model in radians: [x, y, z]
+  rotation: [0, 0, 0],
+
+  // Camera starts zoomed in. Smaller distance = closer view.
+  cameraPosition: [2.7, 1.45, 2.75],
+  cameraFov: 28,
+
+  // Orbit center. Adjust if the rotation point feels off.
+  controlsTarget: [0, 0.2, 0],
+
+};
 
 const MACHINE_CONFIGS = {
   mespack: {
@@ -181,7 +244,8 @@ const MACHINE_CONFIGS = {
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
     modelUrl: "/models/mespack.glb",
-    modelPoints: MACHINE_3D_POINTS,
+    modelZones: MACHINE_3D_ZONE_MAPS,
+    modelSettings: MACHINE_3D_MODEL_SETTINGS,
   },
   /* http://localhost:5000/data */
 
@@ -670,9 +734,9 @@ const machineRows = useMemo(() => {
             ) : (
               <Machine3DView
                 machine={activeMachine}
-                rows={machineRows}
+                zones={zoneRows}
                 selectedPoint={selectedPoint}
-                onPointClick={openPointDetails}
+                onZoneClick={(zone) => selectZone(zone, true)}
               />
             )}
           </div>
@@ -728,7 +792,7 @@ const machineRows = useMemo(() => {
                 />
                 <DetailItem
                   label="Interlock"
-                  value={selectedPoint.interlockOk ? "OK" : "INTERLOCK"}
+                  value={selectedPoint.interlockOk ? "OK" : "FAULT"}
                 />
                 <DetailItem label="Guard Tag" value={selectedPoint.guardTag} wide />
                 <DetailItem
@@ -784,68 +848,164 @@ const machineRows = useMemo(() => {
    16 - SMALL COMPONENTS
 ========================================================= */
 
-function Machine3DView({ machine, rows, selectedPoint, onPointClick }) {
-  const markerRows = (machine.modelPoints || []).map((marker) => {
-    const row = rows.find((item) => item.id === marker.id);
-    const safety = row ? getSafetyState(row) : { label: "Unknown", className: "warning" };
 
-    return {
-      ...marker,
-      row,
-      safety,
-    };
-  });
+function Machine3DView({ machine, zones, selectedPoint, onZoneClick }) {
+  const modelSettings = machine.modelSettings || MACHINE_3D_MODEL_SETTINGS;
+  const zoneMapById = new Map((machine.modelZones || []).map((zone) => [zone.id, zone]));
+
+  const zoneOverlays = zones
+    .map((zone) => ({
+      ...zone,
+      map3d: zoneMapById.get(zone.id),
+    }))
+    .filter((zone) => zone.map3d);
 
   return (
-    <div className="machine-3d-view">
-      <div className="machine-map-grid" />
+    <div className="machine-3d-view real-glb-view embedded-3d-map zone-wrap-3d-view">
+      <Canvas
+        className="machine-3d-canvas"
+        camera={{
+          position: modelSettings.cameraPosition,
+          fov: modelSettings.cameraFov || 28,
+        }}
+        shadows
+      >
+        <color attach="background" args={["#eef5ff"]} />
+        <ambientLight intensity={0.95} />
+        <hemisphereLight intensity={0.72} groundColor="#dbeafe" />
+        <directionalLight position={[4, 6, 5]} intensity={1.25} castShadow />
+        <directionalLight position={[-5, 3, -4]} intensity={0.38} />
 
-      <div className="machine-3d-header">
-        <div>
-          <div className="machine-3d-title">3D Model View</div>
-          <div className="machine-3d-subtitle">
-            Model slot: <span>{machine.modelUrl}</span>
-          </div>
-        </div>
+        <Suspense fallback={null}>
+          <MachineModel
+            url={machine.modelUrl}
+            scale={modelSettings.scale}
+            position={modelSettings.position}
+            rotation={modelSettings.rotation}
+          />
 
-        <div className="machine-3d-hint">Edit MACHINE_3D_POINTS in App.jsx to move markers.</div>
-      </div>
+          <group name="machine-zone-overlays">
+            {zoneOverlays.map((zone) => (
+              <Machine3DZone
+                key={`3d-zone-${zone.id}`}
+                zone={zone}
+                map3d={zone.map3d}
+                isActive={
+                  selectedPoint?.type === "zone" && selectedPoint?.id === zone.id
+                }
+                onZoneClick={onZoneClick}
+              />
+            ))}
+          </group>
+        </Suspense>
 
-      <div className="machine-3d-scene">
-        <div className="machine-3d-floor" />
-        <div className="machine-3d-body body-infeed" />
-        <div className="machine-3d-body body-wrapper" />
-        <div className="machine-3d-body body-main" />
-        <div className="machine-3d-body body-loader" />
-        <div className="machine-3d-body body-outfeed" />
-
-        {markerRows.map((marker) => {
-          if (!marker.row) return null;
-
-          return (
-            <button
-              key={`3d-marker-${marker.id}`}
-              className={`machine-3d-point ${marker.safety.className} ${
-                selectedPoint?.type === "point" && selectedPoint?.id === marker.id
-                  ? "active"
-                  : ""
-              }`}
-              style={{
-                left: `${marker.x}%`,
-                top: `${marker.y}%`,
-                zIndex: 40 + (marker.z || 0),
-              }}
-              title={`${marker.row.name} - ${marker.safety.label}`}
-              onClick={() => onPointClick(marker.row, marker.safety)}
-            >
-              {marker.id}
-            </button>
-          );
-        })}
-      </div>
+        <OrbitControls
+          makeDefault
+          enableDamping
+          dampingFactor={0.08}
+          enableRotate
+          enablePan
+          enableZoom
+          rotateSpeed={0.62}
+          zoomSpeed={0.72}
+          panSpeed={0.6}
+          target={modelSettings.controlsTarget}
+        />
+      </Canvas>
     </div>
   );
 }
+
+function Machine3DZone({ zone, map3d, isActive, onZoneClick }) {
+  const colors = get3DStatusColor(zone.state.className);
+  const labelOffset =
+    map3d.labelOffset || [0, (map3d.size?.[1] || 1) * 0.5 + 0.15, 0];
+
+  const opacity = isActive
+    ? map3d.activeOpacity || 0.28
+    : map3d.opacity || 0.16;
+
+  const zoneRefreshKey = JSON.stringify({
+    id: zone.id,
+    position: map3d.position,
+    size: map3d.size,
+    rotation: map3d.rotation,
+  });
+
+  return (
+    <group
+      key={zoneRefreshKey}
+      position={map3d.position}
+      rotation={map3d.rotation || [0, 0, 0]}
+    >
+      <mesh
+        castShadow
+        receiveShadow
+        renderOrder={20}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+          onZoneClick(zone);
+        }}
+      >
+        <boxGeometry args={map3d.size} />
+        <meshStandardMaterial
+          color={colors.fill}
+          emissive={colors.emissive}
+          emissiveIntensity={isActive ? 0.22 : 0.12}
+          transparent
+          opacity={opacity}
+          roughness={0.48}
+          metalness={0.02}
+          depthWrite={false}
+        />
+        <Edges color={colors.edge} scale={1.001} threshold={15} />
+      </mesh>
+
+      <Billboard position={labelOffset} follow>
+        <group
+          onPointerDown={(event) => {
+            event.stopPropagation();
+            onZoneClick(zone);
+          }}
+        >
+          <mesh renderOrder={21}>
+            <planeGeometry args={[map3d.labelWidth || 1, map3d.labelHeight || 0.24]} />
+            <meshBasicMaterial color={colors.labelBg} transparent opacity={0.94} />
+          </mesh>
+
+          <Text
+            position={[0, 0, 0.01]}
+            fontSize={map3d.labelTextSize || 0.13}
+            color="#ffffff"
+            anchorX="center"
+            anchorY="middle"
+            outlineWidth={0.004}
+            outlineColor="rgba(15,23,42,0.45)"
+            renderOrder={22}
+          >
+            {zone.name}
+          </Text>
+        </group>
+      </Billboard>
+    </group>
+  );
+}
+
+function MachineModel({ url, scale, position, rotation }) {
+  const { scene } = useGLTF(url);
+
+  return (
+    <primitive
+      object={scene}
+      scale={scale}
+      position={position}
+      rotation={rotation}
+      dispose={null}
+    />
+  );
+}
+
+useGLTF.preload("/models/mespack.glb");
 
 function SummaryStat({ value, label, variant }) {
   return (
@@ -868,9 +1028,10 @@ function DetailItem({ label, value, wide }) {
 /* =========================================================
    17 - STATUS LOGIC
    Your final mapping:
-   Green  = Ready
-   Yellow = Guard Open
-   Red    = Interlock
+   Healthy ON  + Guard ON  = READY / Green
+   Healthy OFF + Guard OFF = NOT READY / Red
+   Healthy OFF + Guard ON  = FAULT / Red
+   Healthy ON  + Guard OFF = NOT READY / Yellow
 ========================================================= */
 
 function getSafetyState(point) {
@@ -884,7 +1045,7 @@ function getSafetyState(point) {
     };
   }
 
-  // Any guard-open condition should show yellow.
+  // Any open guard should be yellow.
   if (!guardOn) {
     return {
       label: "Guard Open",
@@ -893,7 +1054,7 @@ function getSafetyState(point) {
   }
 
   // Guard is closed, but interlock/healthy signal is not OK.
-  // This should show red.
+  // This should be red.
   if (!healthyOn && guardOn) {
     return {
       label: "Interlock",
@@ -929,6 +1090,34 @@ function getZoneState(tags) {
   return {
     label: "Ready",
     className: "safe",
+  };
+}
+
+
+function get3DStatusColor(className) {
+  if (className === "danger") {
+    return {
+      fill: "#ef4444",
+      emissive: "#991b1b",
+      edge: "#b91c1c",
+      labelBg: "#b91c1c",
+    };
+  }
+
+  if (className === "warning") {
+    return {
+      fill: "#facc15",
+      emissive: "#a16207",
+      edge: "#ca8a04",
+      labelBg: "#b38706",
+    };
+  }
+
+  return {
+    fill: "#22c55e",
+    emissive: "#166534",
+    edge: "#15803d",
+    labelBg: "#15803d",
   };
 }
 
