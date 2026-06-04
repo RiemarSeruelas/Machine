@@ -750,7 +750,7 @@ const machineRows = useMemo(() => {
                 />
                 <DetailItem
                   label="Interlock"
-                  value={selectedPoint.interlockOk ? "OK" : "FAULT"}
+                  value={selectedPoint.interlockOk ? "OK" : "INTERLOCK"}
                 />
                 <DetailItem label="Guard Tag" value={selectedPoint.guardTag} wide />
                 <DetailItem
@@ -890,10 +890,9 @@ function DetailItem({ label, value, wide }) {
 /* =========================================================
    17 - STATUS LOGIC
    Your final mapping:
-   Healthy ON  + Guard ON  = READY / Green
-   Healthy OFF + Guard OFF = NOT READY / Red
-   Healthy OFF + Guard ON  = FAULT / Red
-   Healthy ON  + Guard OFF = NOT READY / Yellow
+   Green  = Ready
+   Yellow = Guard Open
+   Red    = Interlock
 ========================================================= */
 
 function getSafetyState(point) {
@@ -907,23 +906,19 @@ function getSafetyState(point) {
     };
   }
 
-  if (!healthyOn && !guardOn) {
+  // Any guard-open condition should show yellow.
+  if (!guardOn) {
     return {
-      label: "Guard open",
+      label: "Guard Open",
       className: "warning",
     };
   }
 
+  // Guard is closed, but interlock/healthy signal is not OK.
+  // This should show red.
   if (!healthyOn && guardOn) {
     return {
-      label: "Guard open",
-      className: "warning",
-    };
-  }
-
-  if (healthyOn && !guardOn) {
-    return {
-      label: "Fault",
+      label: "Interlock",
       className: "danger",
     };
   }
@@ -936,19 +931,19 @@ function getSafetyState(point) {
 
 function getZoneState(tags) {
   const states = tags.map((tag) => getSafetyState(tag));
-  const hasFault = states.some((state) => state.className === "danger");
+  const hasInterlock = states.some((state) => state.className === "danger");
   const hasGuardOpen = states.some((state) => state.className === "warning");
 
-  if (hasFault) {
+  if (hasInterlock) {
     return {
-      label: "Fault",
+      label: "Interlock",
       className: "danger",
     };
   }
 
   if (hasGuardOpen) {
     return {
-      label: "Guard open",
+      label: "Guard Open",
       className: "warning",
     };
   }
