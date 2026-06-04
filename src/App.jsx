@@ -77,40 +77,62 @@ const MACHINE_ZONES = [
     labelY: "73%",
     zoomScale: 2.45,
     detailImage: zoneMainRealistic,
-    tagIds: [34, 35, 36, 37, 38, 39, 1, 2, 3],
+    tagIds: [1, 2, 26, 36],
   },
   {
     id: "zone-wrapper",
-    name: "Guards and Doors",
+    name: "Wrapping",
     area: "Wrapping Section",
     points: "35,56 56,45 60,50 60,66 38,79 38,60",
     labelX: "44%",
     labelY: "63%",
     zoomScale: 2.1,
     detailImage: zoneMainRealistic,
-    tagIds: [4, 5, 6, 7, 8, 9, 33, 32, 31, 30, 29, 28],
+    tagIds: [3, 4, 5, 6, 7, 27, 28, 29],
   },
   {
     id: "zone-main",
-    name: "Guards and Doors",
+    name: "Main Machine",
     area: "Main Machine",
     points: "56,45 74,34 77,40 77,57 60,65 60,50",
     labelX: "70%",
     labelY: "55%",
     zoomScale: 2,
     detailImage: zoneMainRealistic,
-    tagIds: [10, 11, 12, 13, 27, 26, 25, 24],
+    tagIds: [8, 9, 10, 11, 30, 31, 37],
+  },
+  {
+    id: "zone-loader",
+    name: "Top Loader",
+    area: "Top Loader",
+    points: "58,34 61,32 65,10 66.3,10 68.5,14 72,13 77,23 77,30 58,39 ",
+    labelX: "65%",
+    labelY: "25%",
+    zoomScale: 2.4,
+    detailImage: zoneMainRealistic,
+    tagIds: [12, 13, 14, 15, 38],
   },
    {
     id: "zone-center",
-    name: "Guards and Doors",
+    name: "Center Guarding",
     area: "Center Guarding",
     points: "74,34 88.3,26 93,30 93,48 77,57 77,40",
     labelX: "87%",
     labelY: "49%",
     zoomScale: 2.15,
     detailImage: zoneMainRealistic,
-    tagIds: [14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+    tagIds: [16, 17, 18, 19, 20, 21, 22, 23, 32, 33, 34],
+  }, 
+  {
+    id: "zone-outfeed",
+    name: "Outfeed",
+    area: "Outfeed Section",
+    points: "88,48 91,46 95,50 95,60 91,60 88,56",
+    labelX: "94%",
+    labelY: "57%",
+    zoomScale: 2.5,
+    detailImage: zoneMainRealistic,
+    tagIds: [24, 25, 35, 39],
   },
 ];
 
@@ -122,6 +144,7 @@ const MACHINE_CONFIGS = {
     subtitle: "Real-time guard and interlock status",
     apiUrl: "/api/data",
     image: machineImage,
+    model3d: "/models/mespack.glb",
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
   },
@@ -134,6 +157,7 @@ const MACHINE_CONFIGS = {
     subtitle: "Real-time machine status monitoring",
     apiUrl: "/api/data-machine2",
     image: machineImage,
+    model3d: "/models/mespack.glb",
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
   }, */
@@ -145,6 +169,7 @@ export default function App() {
   const [apiError, setApiError] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [theme, setTheme] = useState("light");
+  const [viewMode, setViewMode] = useState("2d");
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
 
@@ -180,28 +205,8 @@ export default function App() {
     return () => clearInterval(interval);
   }, [activeMachineId]);
 
-  const payload = machineData?.data || machineData || {};
-  const status = normalizeStatus(machineData?.status || payload?.overallStatus || "WAITING");
-
-  const liveDoors = useMemo(() => {
-    return parseDoors(payload?.doors);
-  }, [payload?.doors]);
-
-  const liveDoorById = useMemo(() => {
-    const map = new Map();
-
-    liveDoors.forEach((door) => {
-      const id =
-        Number(door?.doorNo) ||
-        Number(String(door?.doorTagName || "").replace(/\D/g, ""));
-
-      if (id) {
-        map.set(id, door);
-      }
-    });
-
-    return map;
-  }, [liveDoors]);
+  const status = machineData?.status || "WAITING";
+  const payload = machineData?.data || {};
 
  /* =========================================================
    04 - BUILD LIVE MACHINE ROWS
@@ -218,20 +223,8 @@ export default function App() {
 
 const machineRows = useMemo(() => {
   return activeMachine.points.map((point) => {
-    const liveDoor = liveDoorById.get(point.id);
-
-    // Keep HighByte status for reference/details, but UI color is calculated
-    // from the requested truth table below:
-    // guard down/open wins as yellow; red is interlock down only while guard is good.
-    const liveDoorStatus = normalizeStatus(liveDoor?.status);
-
-    const liveGuardOnValue =
-      liveDoor?.doorValue !== undefined ? liveDoor.doorValue : payload?.[point.guardTag];
-
-    const liveHealthyValue =
-      liveDoor?.diagnosticValue !== undefined
-        ? liveDoor.diagnosticValue
-        : payload?.[point.interlockTag];
+    const liveGuardOnValue = payload?.[point.guardTag];
+    const liveHealthyValue = payload?.[point.interlockTag];
 
     const guardOn =
       liveGuardOnValue === undefined
@@ -246,17 +239,16 @@ const machineRows = useMemo(() => {
     return {
       ...point,
 
-      // Keep raw/live values for the details modal.
-      doorValue: liveGuardOnValue,
-      diagnosticValue: liveHealthyValue,
-      doorStatus: liveDoorStatus,
-
-      // Old booleans are still kept as fallback only.
+      // Convert Guard ON into guardOpen
+      // Guard ON true  = guardOpen false
+      // Guard ON false = guardOpen true
       guardOpen: !guardOn,
+
+      // Healthy signal maps directly
       interlockOk: healthyOn,
     };
   });
-}, [payload, activeMachine, liveDoorById]);
+}, [payload, activeMachine]);
 
   /* ====================================================   =====
      05 - LEFT PANEL ATTENTION LOGIC
@@ -379,6 +371,21 @@ const machineRows = useMemo(() => {
         >
           {theme === "dark" ? "☀ Light" : "🌙 Dark"}
         </button>
+
+        <label className="view-mode-select-wrap" title="Switch machine visual">
+          <span>View</span>
+          <select
+            className="view-mode-select"
+            value={viewMode}
+            onChange={(event) => {
+              setViewMode(event.target.value);
+              resetView();
+            }}
+          >
+            <option value="2d">2D</option>
+            <option value="3d">3D</option>
+          </select>
+        </label>
       </div>
     </div>
 
@@ -450,7 +457,7 @@ const machineRows = useMemo(() => {
             <div className="side-count">{machineRows.length}</div>
           </div>
 
-
+          <SafetyLegend />
 
           {/* UPDATE: NEEDS ATTENTION SECTION */}
           <div className="left-attention-card">
@@ -553,6 +560,7 @@ const machineRows = useMemo(() => {
 
         <section className="panel center-panel machine-center-panel">
           <div className="table-card">
+            {viewMode === "2d" ? (
             <div className={`machine-map ${activeZoomZone ? "zoomed" : ""}`}>
               <div className="machine-map-grid" />
 
@@ -627,6 +635,14 @@ const machineRows = useMemo(() => {
                 </button>
               )}
             </div>
+            ) : (
+              <Machine3DView
+                activeMachine={activeMachine}
+                zoneRows={zoneRows}
+                selectedPoint={selectedPoint}
+                selectZone={selectZone}
+              />
+            )}
           </div>
         </section>
       </main>
@@ -675,16 +691,12 @@ const machineRows = useMemo(() => {
                 <DetailItem label="Point No." value={selectedPoint.id} />
                 <DetailItem label="Status" value={selectedPoint.state.label} />
                 <DetailItem
-                  label="HighByte Status"
-                  value={selectedPoint.doorStatus || selectedPoint.state.label}
+                  label="Guard"
+                  value={selectedPoint.guardOpen ? "OPEN" : "CLOSED"}
                 />
                 <DetailItem
-                  label="Guard Raw"
-                  value={String(selectedPoint.doorValue ?? "N/A")}
-                />
-                <DetailItem
-                  label="Diagnostic Raw"
-                  value={String(selectedPoint.diagnosticValue ?? "N/A")}
+                  label="Interlock"
+                  value={selectedPoint.interlockOk ? "OK" : "FAULT"}
                 />
                 <DetailItem label="Guard Tag" value={selectedPoint.guardTag} wide />
                 <DetailItem
@@ -741,6 +753,90 @@ const machineRows = useMemo(() => {
 ========================================================= */
 
 
+function Machine3DView({ activeMachine, zoneRows, selectedPoint, selectZone }) {
+  return (
+    <div className="machine-3d-view">
+      <div className="machine-3d-header">
+        <div>
+          <div className="machine-3d-title">{activeMachine.name} 3D View</div>
+          <div className="machine-3d-subtitle">
+            Model slot: <span>{activeMachine.model3d}</span>
+          </div>
+        </div>
+        <div className="machine-3d-chip">3D MODE</div>
+      </div>
+
+      <div className="machine-3d-scene" aria-label={`${activeMachine.name} 3D model view`}>
+        <div className="machine-3d-floor" />
+        <div className="machine-3d-model">
+          {zoneRows.map((zone, index) => (
+            <button
+              key={zone.id}
+              className={`machine-3d-zone zone-${index + 1} ${zone.state.className} ${
+                selectedPoint?.type === "zone" && selectedPoint?.id === zone.id
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() => selectZone(zone, true)}
+              title={`${zone.name} - ${zone.state.label}`}
+            >
+              <span>{zone.name}</span>
+              <b>{zone.state.label}</b>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="machine-3d-note">
+        Put the real GLB/GLTF model in <b>public/models/mespack.glb</b>. This view is already wired to the same zone status colors.
+      </div>
+    </div>
+  );
+}
+
+function SafetyLegend() {
+  return (
+    <div className="safety-legend-card">
+      <div className="safety-legend-head">
+        <span>State</span>
+        <span>Meaning</span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy ON + Guard ON</span>
+        <span className="legend-meaning ready">
+          <span className="legend-icon ready">✓</span>
+          Ready
+        </span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy OFF + Guard OFF</span>
+        <span className="legend-meaning warning">
+          <span className="legend-dot warning" />
+          Guard open
+        </span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy OFF + Guard ON</span>
+        <span className="legend-meaning warning">
+          <span className="legend-dot warning" />
+          Guard open
+        </span>
+      </div>
+
+      <div className="safety-legend-row">
+        <span>Healthy ON + Guard OFF</span>
+        <span className="legend-meaning danger">
+          <span className="legend-dot danger" />
+          Fault
+        </span>
+      </div>
+    </div>
+  );
+}
+
 function SummaryStat({ value, label, variant }) {
   return (
     <div className={`summary-stat ${variant || ""}`}>
@@ -761,33 +857,48 @@ function DetailItem({ label, value, wide }) {
 
 /* =========================================================
    17 - STATUS LOGIC
+   Your final mapping:
+   Healthy ON  + Guard ON  = READY / Green
+   Healthy OFF + Guard OFF = NOT READY / Red
+   Healthy OFF + Guard ON  = FAULT / Red
+   Healthy ON  + Guard OFF = NOT READY / Yellow
 ========================================================= */
 
 function getSafetyState(point) {
-  const interlockGood = point?.interlockOk === true;
-  const guardGood = point?.guardOpen === false;
+  const healthyOn = point.interlockOk === true;
+  const guardOn = point.guardOpen === false;
 
-  // Requested color logic:
-  // Green  = Ready              = interlock good + guard good
-  // Yellow = Guard Open         = guard down/open, regardless of interlock
-  // Red    = Interlock / Fault  = interlock down only while guard is good
-  if (!guardGood) {
+  if (healthyOn && guardOn) {
+    return {
+      label: "Ready",
+      className: "safe",
+    };
+  }
+
+  if (!healthyOn && !guardOn) {
+    return {
+      label: "Guard open",
+      className: "warning",
+    };
+  }
+
+  if (!healthyOn && guardOn) {
     return {
       label: "Guard Open",
       className: "warning",
     };
   }
 
-  if (!interlockGood) {
+  if (healthyOn && !guardOn) {
     return {
-      label: "Interlock",
+      label: "Fault",
       className: "danger",
     };
   }
 
   return {
-    label: "Ready",
-    className: "safe",
+    label: "Unknown",
+    className: "warning",
   };
 }
 
@@ -800,7 +911,7 @@ function getZoneState(tags) {
 
   if (dangerCount > 0) {
     return {
-      label: `${dangerCount} Interlock`,
+      label: "Fault",
       className: "danger",
       dangerCount,
       warningCount,
@@ -810,7 +921,7 @@ function getZoneState(tags) {
 
   if (warningCount > 0) {
     return {
-      label: `${warningCount} Guard Open`,
+      label: "Guard open",
       className: "warning",
       dangerCount,
       warningCount,
@@ -830,26 +941,6 @@ function getZoneState(tags) {
 /* =========================================================
    18 - UTILS
 ========================================================= */
-
-function parseDoors(value) {
-  if (Array.isArray(value)) return value;
-
-  if (typeof value === "string") {
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-
-  return [];
-}
-
-function normalizeStatus(value) {
-  const raw = Array.isArray(value) ? value[0] : value;
-  return String(raw || "").trim().toUpperCase();
-}
 
 function getStatusClass(status) {
   if (status === "READY") return "running";

@@ -2300,3 +2300,295 @@ button:hover {
     height: 15px;
   }
 }
+
+/* =========================================================
+   21 - 2D / 3D VIEW MODE SELECTOR
+========================================================= */
+
+.view-mode-select-wrap {
+  height: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 0 10px 0 12px;
+  background: rgba(255, 255, 255, 0.075);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.view-mode-select {
+  height: 24px;
+  min-width: 58px;
+  border: none;
+  border-radius: 7px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  font-size: 11px;
+  font-weight: 950;
+  outline: none;
+  cursor: pointer;
+}
+
+.view-mode-select option {
+  color: #111827;
+  background: white;
+}
+
+/* =========================================================
+   22 - 3D MODEL VIEW
+========================================================= */
+
+.machine-3d-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(59, 130, 246, 0.16), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #eaf1fb 100%);
+  border: 1px solid rgba(124, 58, 237, 0.18);
+}
+
+.machine-3d-header {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 14px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+}
+
+.machine-3d-title {
+  font-size: 15px;
+  font-weight: 950;
+  color: var(--text);
+}
+
+.machine-3d-subtitle {
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.machine-3d-subtitle span {
+  color: #2563eb;
+}
+
+.machine-3d-chip {
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.machine-3d-scene {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  perspective: 1100px;
+  overflow: hidden;
+}
+
+.machine-3d-floor {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 11%;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.16), transparent 68%);
+  transform: rotateX(62deg);
+  filter: blur(2px);
+}
+
+.machine-3d-model {
+  position: relative;
+  width: min(850px, 78%);
+  height: 245px;
+  transform-style: preserve-3d;
+  transform: rotateX(58deg) rotateZ(-25deg) translateY(26px);
+}
+
+.machine-3d-zone {
+  position: absolute;
+  min-width: 118px;
+  height: 80px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  text-align: center;
+  box-shadow:
+    0 18px 24px rgba(15, 23, 42, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+  transform-style: preserve-3d;
+  transform: translateZ(28px);
+}
+
+.machine-3d-zone::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -24px 0;
+  height: 24px;
+  border-radius: 0 0 12px 12px;
+  background: rgba(15, 23, 42, 0.22);
+  transform-origin: top;
+  transform: rotateX(-90deg);
+}
+
+.machine-3d-zone span {
+  font-size: 11px;
+  font-weight: 950;
+  line-height: 1.05;
+}
+
+.machine-3d-zone b {
+  font-size: 8px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.86;
+}
+
+.machine-3d-zone.safe {
+  background: linear-gradient(145deg, #16a34a, #15803d);
+}
+
+.machine-3d-zone.warning {
+  background: linear-gradient(145deg, #d97706, #a16207);
+}
+
+.machine-3d-zone.danger {
+  background: linear-gradient(145deg, #dc2626, #991b1b);
+}
+
+.machine-3d-zone.active,
+.machine-3d-zone:hover {
+  transform: translateZ(44px) scale(1.04);
+  filter: brightness(1.06);
+}
+
+.machine-3d-zone.zone-1 { left: 0%; top: 88px; }
+.machine-3d-zone.zone-2 { left: 17%; top: 62px; width: 150px; }
+.machine-3d-zone.zone-3 { left: 37%; top: 40px; width: 150px; }
+.machine-3d-zone.zone-4 { left: 49%; top: -48px; width: 126px; }
+.machine-3d-zone.zone-5 { left: 61%; top: 24px; width: 160px; }
+.machine-3d-zone.zone-6 { right: 0%; top: 72px; }
+
+.machine-3d-note {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  z-index: 30;
+  padding: 11px 14px;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.86);
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.app-shell[data-theme="dark"] .machine-3d-view {
+  background:
+    radial-gradient(circle at 50% 18%, rgba(59, 130, 246, 0.18), transparent 30%),
+    linear-gradient(180deg, #111827 0%, #0f172a 100%);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.app-shell[data-theme="dark"] .machine-3d-header {
+  background: rgba(15, 23, 42, 0.78);
+  border-color: rgba(148, 163, 184, 0.25);
+}
+
+.app-shell[data-theme="dark"] .machine-3d-chip {
+  color: #bfdbfe;
+  background: rgba(59, 130, 246, 0.18);
+}
+
+@media (max-width: 768px) {
+  .view-mode-select-wrap {
+    height: 28px;
+    min-height: 28px;
+    padding: 0 7px;
+    border-radius: 999px;
+    font-size: 7px;
+    gap: 5px;
+  }
+
+  .view-mode-select {
+    height: 20px;
+    min-width: 48px;
+    font-size: 8px;
+  }
+
+  .machine-3d-view {
+    height: 360px;
+    min-height: 360px;
+  }
+
+  .machine-3d-header {
+    left: 10px;
+    right: 10px;
+    top: 10px;
+    padding: 10px;
+  }
+
+  .machine-3d-title {
+    font-size: 12px;
+  }
+
+  .machine-3d-subtitle {
+    font-size: 8px;
+  }
+
+  .machine-3d-chip {
+    height: 24px;
+    font-size: 8px;
+    padding: 0 9px;
+  }
+
+  .machine-3d-model {
+    width: 88%;
+    height: 190px;
+    transform: rotateX(58deg) rotateZ(-25deg) translateY(38px) scale(0.72);
+  }
+
+  .machine-3d-note {
+    font-size: 9px;
+    padding: 9px;
+  }
+}
