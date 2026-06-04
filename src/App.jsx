@@ -3,7 +3,8 @@ import "./App.css";
 import machineImage from "./assets/machine.png";
 import zoneMainRealistic from "./assets/zone.png";
 import { Canvas } from "@react-three/fiber";
-import { Billboard, Edges, OrbitControls, Text, useGLTF } from "@react-three/drei";
+import { Billboard, Edges, OrbitControls, useGLTF } from "@react-three/drei";
+import * as THREE from "three";
 
 /* =========================================================
    01 - MACHINE POINTS / TAG CONFIG
@@ -868,12 +869,11 @@ function Machine3DView({ machine, zones, selectedPoint, onZoneClick }) {
           position: modelSettings.cameraPosition,
           fov: modelSettings.cameraFov || 28,
         }}
-        shadows
       >
         <color attach="background" args={["#eef5ff"]} />
         <ambientLight intensity={0.95} />
         <hemisphereLight intensity={0.72} groundColor="#dbeafe" />
-        <directionalLight position={[4, 6, 5]} intensity={1.25} castShadow />
+        <directionalLight position={[4, 6, 5]} intensity={1.25} />
         <directionalLight position={[-5, 3, -4]} intensity={0.38} />
 
         <Suspense fallback={null}>
@@ -968,26 +968,61 @@ function Machine3DZone({ zone, map3d, isActive, onZoneClick }) {
             onZoneClick(zone);
           }}
         >
-          <mesh renderOrder={21}>
-            <planeGeometry args={[map3d.labelWidth || 1, map3d.labelHeight || 0.24]} />
-            <meshBasicMaterial color={colors.labelBg} transparent opacity={0.94} />
-          </mesh>
-
-          <Text
-            position={[0, 0, 0.01]}
-            fontSize={map3d.labelTextSize || 0.13}
-            color="#ffffff"
-            anchorX="center"
-            anchorY="middle"
-            outlineWidth={0.004}
-            outlineColor="rgba(15,23,42,0.45)"
-            renderOrder={22}
-          >
-            {zone.name}
-          </Text>
+          <CanvasTextLabel
+            text={zone.name}
+            width={map3d.labelWidth || 1}
+            height={map3d.labelHeight || 0.24}
+            background={colors.labelBg}
+          />
         </group>
       </Billboard>
     </group>
+  );
+}
+
+
+function CanvasTextLabel({ text, width, height, background }) {
+  const texture = useMemo(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 128;
+
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const radius = 18;
+    ctx.fillStyle = background || "#15803d";
+    ctx.beginPath();
+    ctx.moveTo(radius, 0);
+    ctx.lineTo(canvas.width - radius, 0);
+    ctx.quadraticCurveTo(canvas.width, 0, canvas.width, radius);
+    ctx.lineTo(canvas.width, canvas.height - radius);
+    ctx.quadraticCurveTo(canvas.width, canvas.height, canvas.width - radius, canvas.height);
+    ctx.lineTo(radius, canvas.height);
+    ctx.quadraticCurveTo(0, canvas.height, 0, canvas.height - radius);
+    ctx.lineTo(0, radius);
+    ctx.quadraticCurveTo(0, 0, radius, 0);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 46px Arial, sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(String(text || ""), canvas.width / 2, canvas.height / 2 + 2);
+
+    const canvasTexture = new THREE.CanvasTexture(canvas);
+    canvasTexture.colorSpace = THREE.SRGBColorSpace;
+    canvasTexture.needsUpdate = true;
+
+    return canvasTexture;
+  }, [text, background]);
+
+  return (
+    <mesh renderOrder={21}>
+      <planeGeometry args={[width, height]} />
+      <meshBasicMaterial map={texture} transparent />
+    </mesh>
   );
 }
 
