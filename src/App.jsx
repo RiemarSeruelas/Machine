@@ -136,6 +136,62 @@ const MACHINE_ZONES = [
   },
 ];
 
+
+/* =========================================================
+   03 - 3D POINT POSITIONS
+   Adjust these later to line up with your real 3D model.
+
+   Coordinates are percentages inside the 3D panel:
+     x = left/right position
+     y = up/down position
+     z = visual depth layer only for styling/order
+
+   When you replace the placeholder with a real GLB model, keep the same
+   ids so the live door status still maps to the correct marker.
+========================================================= */
+
+const MACHINE_3D_POINTS = [
+  { id: 1, x: 10, y: 60, z: 0 },
+  { id: 2, x: 13, y: 66, z: 0 },
+  { id: 3, x: 23, y: 58, z: 1 },
+  { id: 4, x: 27, y: 55, z: 1 },
+  { id: 5, x: 31, y: 52, z: 1 },
+  { id: 6, x: 35, y: 50, z: 1 },
+  { id: 7, x: 39, y: 48, z: 1 },
+  { id: 8, x: 47, y: 44, z: 2 },
+  { id: 9, x: 51, y: 42, z: 2 },
+  { id: 10, x: 55, y: 40, z: 2 },
+  { id: 11, x: 59, y: 38, z: 2 },
+  { id: 12, x: 55, y: 20, z: 3 },
+  { id: 13, x: 58, y: 17, z: 3 },
+  { id: 14, x: 62, y: 15, z: 3 },
+  { id: 15, x: 66, y: 17, z: 3 },
+  { id: 16, x: 70, y: 31, z: 2 },
+  { id: 17, x: 74, y: 29, z: 2 },
+  { id: 18, x: 78, y: 30, z: 2 },
+  { id: 19, x: 81, y: 34, z: 2 },
+  { id: 20, x: 84, y: 38, z: 2 },
+  { id: 21, x: 69, y: 45, z: 2 },
+  { id: 22, x: 73, y: 47, z: 2 },
+  { id: 23, x: 77, y: 49, z: 2 },
+  { id: 24, x: 89, y: 51, z: 1 },
+  { id: 25, x: 92, y: 55, z: 1 },
+  { id: 26, x: 17, y: 74, z: 0 },
+  { id: 27, x: 33, y: 64, z: 1 },
+  { id: 28, x: 38, y: 61, z: 1 },
+  { id: 29, x: 43, y: 58, z: 1 },
+  { id: 30, x: 57, y: 55, z: 2 },
+  { id: 31, x: 62, y: 52, z: 2 },
+  { id: 32, x: 80, y: 54, z: 2 },
+  { id: 33, x: 84, y: 57, z: 2 },
+  { id: 34, x: 76, y: 63, z: 1 },
+  { id: 35, x: 91, y: 64, z: 1 },
+  { id: 36, x: 21, y: 82, z: 0 },
+  { id: 37, x: 61, y: 71, z: 1 },
+  { id: 38, x: 66, y: 27, z: 3 },
+  { id: 39, x: 94, y: 68, z: 1 },
+];
+
 const MACHINE_CONFIGS = {
   mespack: {
     id: "mespack",
@@ -144,9 +200,10 @@ const MACHINE_CONFIGS = {
     subtitle: "Real-time guard and interlock status",
     apiUrl: "/api/data",
     image: machineImage,
-    model3d: "/models/mespack.glb",
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
+    modelUrl: "/models/mespack.glb",
+    modelPoints: MACHINE_3D_POINTS,
   },
   /* http://localhost:5000/data */
 
@@ -157,7 +214,6 @@ const MACHINE_CONFIGS = {
     subtitle: "Real-time machine status monitoring",
     apiUrl: "/api/data-machine2",
     image: machineImage,
-    model3d: "/models/mespack.glb",
     points: MACHINE_POINTS,
     zones: MACHINE_ZONES,
   }, */
@@ -365,17 +421,10 @@ const machineRows = useMemo(() => {
           <span>{status}</span>
         </div>
 
-        <button
-          className="top-nav-btn"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        >
-          {theme === "dark" ? "☀ Light" : "🌙 Dark"}
-        </button>
-
-        <label className="view-mode-select-wrap" title="Switch machine visual">
+        <label className="top-view-select-wrap" title="Switch machine view">
           <span>View</span>
           <select
-            className="view-mode-select"
+            className="top-view-select"
             value={viewMode}
             onChange={(event) => {
               setViewMode(event.target.value);
@@ -386,6 +435,13 @@ const machineRows = useMemo(() => {
             <option value="3d">3D</option>
           </select>
         </label>
+
+        <button
+          className="top-nav-btn"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          {theme === "dark" ? "☀ Light" : "🌙 Dark"}
+        </button>
       </div>
     </div>
 
@@ -456,8 +512,6 @@ const machineRows = useMemo(() => {
 
             <div className="side-count">{machineRows.length}</div>
           </div>
-
-          <SafetyLegend />
 
           {/* UPDATE: NEEDS ATTENTION SECTION */}
           <div className="left-attention-card">
@@ -637,10 +691,10 @@ const machineRows = useMemo(() => {
             </div>
             ) : (
               <Machine3DView
-                activeMachine={activeMachine}
-                zoneRows={zoneRows}
+                machine={activeMachine}
+                rows={machineRows}
                 selectedPoint={selectedPoint}
-                selectZone={selectZone}
+                onPointClick={openPointDetails}
               />
             )}
           </div>
@@ -752,86 +806,64 @@ const machineRows = useMemo(() => {
    16 - SMALL COMPONENTS
 ========================================================= */
 
+function Machine3DView({ machine, rows, selectedPoint, onPointClick }) {
+  const markerRows = (machine.modelPoints || []).map((marker) => {
+    const row = rows.find((item) => item.id === marker.id);
+    const safety = row ? getSafetyState(row) : { label: "Unknown", className: "warning" };
 
-function Machine3DView({ activeMachine, zoneRows, selectedPoint, selectZone }) {
+    return {
+      ...marker,
+      row,
+      safety,
+    };
+  });
+
   return (
     <div className="machine-3d-view">
+      <div className="machine-map-grid" />
+
       <div className="machine-3d-header">
         <div>
-          <div className="machine-3d-title">{activeMachine.name} 3D View</div>
+          <div className="machine-3d-title">3D Model View</div>
           <div className="machine-3d-subtitle">
-            Model slot: <span>{activeMachine.model3d}</span>
+            Model slot: <span>{machine.modelUrl}</span>
           </div>
         </div>
-        <div className="machine-3d-chip">3D MODE</div>
+
+        <div className="machine-3d-hint">Edit MACHINE_3D_POINTS in App.jsx to move markers.</div>
       </div>
 
-      <div className="machine-3d-scene" aria-label={`${activeMachine.name} 3D model view`}>
+      <div className="machine-3d-scene">
         <div className="machine-3d-floor" />
-        <div className="machine-3d-model">
-          {zoneRows.map((zone, index) => (
+        <div className="machine-3d-body body-infeed" />
+        <div className="machine-3d-body body-wrapper" />
+        <div className="machine-3d-body body-main" />
+        <div className="machine-3d-body body-loader" />
+        <div className="machine-3d-body body-outfeed" />
+
+        {markerRows.map((marker) => {
+          if (!marker.row) return null;
+
+          return (
             <button
-              key={zone.id}
-              className={`machine-3d-zone zone-${index + 1} ${zone.state.className} ${
-                selectedPoint?.type === "zone" && selectedPoint?.id === zone.id
+              key={`3d-marker-${marker.id}`}
+              className={`machine-3d-point ${marker.safety.className} ${
+                selectedPoint?.type === "point" && selectedPoint?.id === marker.id
                   ? "active"
                   : ""
               }`}
-              onClick={() => selectZone(zone, true)}
-              title={`${zone.name} - ${zone.state.label}`}
+              style={{
+                left: `${marker.x}%`,
+                top: `${marker.y}%`,
+                zIndex: 40 + (marker.z || 0),
+              }}
+              title={`${marker.row.name} - ${marker.safety.label}`}
+              onClick={() => onPointClick(marker.row, marker.safety)}
             >
-              <span>{zone.name}</span>
-              <b>{zone.state.label}</b>
+              {marker.id}
             </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="machine-3d-note">
-        Put the real GLB/GLTF model in <b>public/models/mespack.glb</b>. This view is already wired to the same zone status colors.
-      </div>
-    </div>
-  );
-}
-
-function SafetyLegend() {
-  return (
-    <div className="safety-legend-card">
-      <div className="safety-legend-head">
-        <span>State</span>
-        <span>Meaning</span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy ON + Guard ON</span>
-        <span className="legend-meaning ready">
-          <span className="legend-icon ready">✓</span>
-          Ready
-        </span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy OFF + Guard OFF</span>
-        <span className="legend-meaning warning">
-          <span className="legend-dot warning" />
-          Guard open
-        </span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy OFF + Guard ON</span>
-        <span className="legend-meaning warning">
-          <span className="legend-dot warning" />
-          Guard open
-        </span>
-      </div>
-
-      <div className="safety-legend-row">
-        <span>Healthy ON + Guard OFF</span>
-        <span className="legend-meaning danger">
-          <span className="legend-dot danger" />
-          Fault
-        </span>
+          );
+        })}
       </div>
     </div>
   );
@@ -884,7 +916,7 @@ function getSafetyState(point) {
 
   if (!healthyOn && guardOn) {
     return {
-      label: "Guard Open",
+      label: "Guard open",
       className: "warning",
     };
   }
@@ -904,37 +936,26 @@ function getSafetyState(point) {
 
 function getZoneState(tags) {
   const states = tags.map((tag) => getSafetyState(tag));
+  const hasFault = states.some((state) => state.className === "danger");
+  const hasGuardOpen = states.some((state) => state.className === "warning");
 
-  const dangerCount = states.filter((state) => state.className === "danger").length;
-  const warningCount = states.filter((state) => state.className === "warning").length;
-  const safeCount = states.filter((state) => state.className === "safe").length;
-
-  if (dangerCount > 0) {
+  if (hasFault) {
     return {
       label: "Fault",
       className: "danger",
-      dangerCount,
-      warningCount,
-      safeCount,
     };
   }
 
-  if (warningCount > 0) {
+  if (hasGuardOpen) {
     return {
       label: "Guard open",
       className: "warning",
-      dangerCount,
-      warningCount,
-      safeCount,
     };
   }
 
   return {
     label: "Ready",
     className: "safe",
-    dangerCount,
-    warningCount,
-    safeCount,
   };
 }
 
